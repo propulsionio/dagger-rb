@@ -11,18 +11,18 @@ module Data::Collection
   end
 
   def fetch_tallies
-    works_coll.find.map do |work_doc|
+    tallies_coll.find.map do |tally_doc|
       {
         :date => {
-          :year => work_doc['year'],
-          :month => work_doc['month'],
-          :day => work_doc['day']
+          :year => tally_doc['year'],
+          :month => tally_doc['month'],
+          :day => tally_doc['day']
         },
         :count => {
-          :total => work_doc['work_count'],
-          :fulltext => work_doc['work_count_ok_fulltext'],
-          :license => work_doc['work_count_ok_license'],
-          :archive => work_doc['work_count_ok_archive']
+          :total => tally_doc['work_count'],
+          :fulltext => tally_doc['work_count_ok_fulltext'],
+          :license => tally_doc['work_count_ok_license'],
+          :archive => tally_doc['work_count_ok_archive']
         }
       }
     end

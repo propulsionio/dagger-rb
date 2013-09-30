@@ -23,9 +23,11 @@ configure do
 end
 
 get '/tallies' do
+  content_type 'application/json'
   fetch_tallies
 end
 
 get '/breakdowns' do
+  content_type 'application/json'
   fetch_breakdowns
 end

@@ -6,7 +6,9 @@ module Data::Work
   include DataConf
 
   def insert_works works
-    works_coll.insert(works)
+    works.each do |work|
+      works_coll.update({:DOI => work['DOI']}, work, {:upsert => true})
+    end
   end
 
 end
