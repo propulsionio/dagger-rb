@@ -9,19 +9,18 @@ api:
 collection:
   server: http://fundref.crossref.org
   type: funder
-  id: 1000000015
+  id: 100000015
   rows-per-request: 200
-  interval: 1 day
-  retry-interval: 10 minutes
+  interval: 1d
+  retry-interval: 10m
   retry-attempts: 10
 
 module:
   - name: license
     acceptable:
-      - http://cc.org/1
-      - http://cc.org/2
+      - http://creativecommons.org/licenses/by/3.0/
   - name: fulltext
   - name: archive
     acceptable:
       - clockss
-      - fish
+
