@@ -1,0 +1,27 @@
+mongo:
+  db: agencyx
+  host: 127.0.0.1
+#  port: 27015
+
+api:
+  port: 8080
+
+collection:
+  server: http://fundref.crossref.org
+  type: funder
+  id: 1000000015
+  rows-per-request: 200
+  interval: 1 day
+  retry-interval: 10 minutes
+  retry-attempts: 10
+
+module:
+  - name: license
+    acceptable:
+      - http://cc.org/1
+      - http://cc.org/2
+  - name: fulltext
+  - name: archive
+    acceptable:
+      - clockss
+      - fish
