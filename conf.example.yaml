@@ -6,6 +6,10 @@ mongo:
 api:
   port: 8080
 
+branding:
+  org: Agency X
+  title: Agency X CHORUS DOI KPI API UI
+
 collection:
   server: http://fundref.crossref.org
   type: funder
@@ -23,4 +27,3 @@ module:
   - name: archive
     acceptable:
       - clockss
-
