@@ -23,7 +23,7 @@ configure do
   include DataConf
   include Aggregate
   
-  config = load_configuration("conf.yaml")
+  config = load_configuration('conf.yaml')
   prepare_database(config)
   prepare_schedule(config)
 

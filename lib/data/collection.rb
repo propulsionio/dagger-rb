@@ -12,7 +12,7 @@ module Data::Collection
 
   def fetch_tallies
     date_sort = [['year', 1], ['month', 1], ['day', 1]]
-    tallies_coll.find({}, {:sort => date_sort}).map do |tally_doc|
+    tallies = tallies_coll.find({}, {:sort => date_sort}).map do |tally_doc|
       {
         :date => {
           :year => tally_doc['year'],
@@ -27,6 +27,45 @@ module Data::Collection
         }
       }
     end
+
+    series = []
+
+    series << {
+      :key => 'Total publications',
+      :values => tallies.map do |d| 
+        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
+        {:x => dt, :y => d[:count][:total]}
+      end
+    }
+
+    series << {
+      :key => 'License OK',
+      :values => tallies.map do |d|
+        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
+        {:x => dt, :y => d[:count][:license]}
+      end
+    }
+
+    series << {
+      :key => 'Fulltext OK',
+      :values => tallies.map do |d|
+        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
+        {:x => dt, :y => d[:count][:fulltext]}
+      end
+    }
+
+    series << {
+      :key => 'Archive OK',
+      :values => tallies.map do |d|
+        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
+        {:x => dt, :y => d[:count][:archive]}
+      end
+    }
+    
+    {
+      :latest => tallies.last,
+      :series => series
+    }
   end
 
   def fetch_breakdowns
