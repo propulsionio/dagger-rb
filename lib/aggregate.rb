@@ -44,7 +44,7 @@ module Aggregate
           insert_works(works)
         end
       else
-        insert_failure(response.code)
+        insert_failure(response.status)
       end
     
       offset = offset + rows

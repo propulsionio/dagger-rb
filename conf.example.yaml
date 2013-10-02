@@ -11,7 +11,7 @@ branding:
   title: Agency X CHORUS DOI KPI API UI
 
 collection:
-  server: http://fundref.crossref.org
+  server: http://api.crossref.org
   type: funder
   id: 100000015
   rows-per-request: 200

@@ -11,6 +11,11 @@ require_relative 'lib/data/collection'
 helpers do
   include Data::Work
   include Data::Collection
+
+  def jsonp structure
+    content_type 'application/json'
+    "#{params[:callback]}(#{structure.to_json});"
+  end
 end
 
 configure do
@@ -26,16 +31,17 @@ configure do
 end
 
 get '/tallies' do
-  content_type 'application/json'
-  fetch_tallies.to_json
+  jsonp(fetch_tallies)
 end
 
 get '/breakdowns' do
-  content_type 'application/json'
-  fetch_breakdowns.to_json
+  jsonp(fetch_breakdowns)
 end
 
 get '/branding' do
-  content_type 'application/json'
-  settings.branding.to_json
+  jsonp(settings.branding)
+end
+
+get '/collections' do
+  jsonp(fetch_collections)
 end

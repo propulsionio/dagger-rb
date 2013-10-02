@@ -11,7 +11,8 @@ module Data::Collection
   end
 
   def fetch_tallies
-    tallies_coll.find.map do |tally_doc|
+    date_sort = [['year', 1], ['month', 1], ['day', 1]]
+    tallies_coll.find({}, {:sort => date_sort}).map do |tally_doc|
       {
         :date => {
           :year => tally_doc['year'],
@@ -29,6 +30,12 @@ module Data::Collection
   end
 
   def fetch_breakdowns
+  end
+
+  def fetch_collections
+    collections_coll.find({}, {:sort => ['at', -1]}).map do |doc|
+      {:at => doc['at'], :success => doc['success'], :http_code => doc['http_code']}
+    end
   end
 
 end
