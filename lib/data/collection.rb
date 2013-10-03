@@ -48,6 +48,20 @@ module Data::Collection
   end
 
   def fetch_breakdowns
+    date_sort = [['year', -1], ['month', -1], ['day', -1]]
+    latest = tallies_coll.find_one({}, {:sort => date_sort})
+    pies = {}
+
+    ['fulltext', 'license', 'archive'].each do |k|
+      values = []
+      values << {:label => 'OK', :value => 0}
+      values << {:label => 'Unknown', :value => latest['work_count'] - latest["work_count_ok_#{k}"]}
+      values << {:label => 'Not OK', :value => 0}
+
+      pies[k] = [{:key => k, :values => values}]
+    end
+
+    pies
   end
 
   def fetch_publishers
