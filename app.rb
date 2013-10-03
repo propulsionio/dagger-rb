@@ -38,6 +38,10 @@ get '/breakdowns' do
   jsonp(fetch_breakdowns)
 end
 
+get '/publishers' do
+  jsonp(fetch_publishers)
+end
+
 get '/branding' do
   jsonp(settings.branding)
 end

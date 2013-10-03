@@ -23,45 +23,24 @@ module Data::Collection
           :total => tally_doc['work_count'],
           :fulltext => tally_doc['work_count_ok_fulltext'],
           :license => tally_doc['work_count_ok_license'],
-          :archive => tally_doc['work_count_ok_archive']
+          :archive => tally_doc['work_count_ok_archive'],
+          :acceptable => tally_doc['work_count_acceptable']
         }
       }
     end
 
     series = []
 
-    series << {
-      :key => 'Total publications',
-      :values => tallies.map do |d| 
-        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
-        {:x => dt, :y => d[:count][:total]}
-      end
-    }
+    [:total, :fulltext, :license, :archive, :acceptable].each do |count_val|
+      series << {
+        :key => count_val,
+        :values => tallies.map do |d| 
+          dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
+          {:x => dt, :y => d[:count][count_val]}
+        end
+      }
+    end
 
-    series << {
-      :key => 'License OK',
-      :values => tallies.map do |d|
-        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
-        {:x => dt, :y => d[:count][:license]}
-      end
-    }
-
-    series << {
-      :key => 'Fulltext OK',
-      :values => tallies.map do |d|
-        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
-        {:x => dt, :y => d[:count][:fulltext]}
-      end
-    }
-
-    series << {
-      :key => 'Archive OK',
-      :values => tallies.map do |d|
-        dt = Date.new(d[:date][:year], d[:date][:month], d[:date][:day]).to_time.to_i
-        {:x => dt, :y => d[:count][:archive]}
-      end
-    }
-    
     {
       :latest => tallies.last,
       :series => series
@@ -69,6 +48,19 @@ module Data::Collection
   end
 
   def fetch_breakdowns
+  end
+
+  def fetch_publishers
+    publishers_coll.find({}).map do |doc|
+      {
+        :name => doc['name'],
+        :title => 'Publications',
+        :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
+        :measures => [doc['work_count']],
+        :markers => [doc['work_count']],
+        :ranges => [0, 250, 500, 1000]
+      }
+    end
   end
 
   def fetch_collections

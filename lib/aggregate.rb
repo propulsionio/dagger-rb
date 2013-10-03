@@ -17,7 +17,36 @@ module Aggregate
     when 'funder'
       "/v1/funders/#{collection['id']}/works"
     when 'publisher'
-      "/v1/publisher/#{collection['id']}/works"
+      "/v1/publishers/#{collection['id']}/works"
+    end
+  end
+
+  def aggregate_publishers modules, right_now
+    group = {'$group' => {
+        '_id' => {
+          'prefix' => '$prefix',
+          'name' => '$publisher'
+        },
+        'work_count' => {'$sum' => 1}}}
+
+    works_coll.aggregate([group]).each do |doc|
+      insert_doc = {
+        :prefix => doc['_id']['prefix'],
+        :name => doc['_id']['name'],
+        :work_count => doc['work_count']
+      }
+
+      today = {
+        :year => right_now.year,
+        :month => right_now.month,
+        :day => right_now.day
+      }
+
+      insert_doc = insert_doc.merge(today)
+      breakdowns_coll.update({:prefix => insert_doc[:prefix]}.merge(today), 
+                             insert_doc, {:upsert => true})
+      publishers_coll.update({:prefix => insert_doc[:prefix]}, 
+                             insert_doc, {:upsert => true})
     end
   end
 
@@ -60,15 +89,21 @@ module Aggregate
     end
 
     right_now = DateTime.now
+    
+    # When collection type of :publisher is chosen, this should do the
+    # reverse - group by funder
+    aggregate_publishers(modules, right_now)
 
-    fulltext_query = {:query => {'link' => {'$exists' => true}}}
+    fulltext_query = {'link' => {'$exists' => true}}
     license_query = {:license => {'$in' => modules['license']['acceptable']}}
     archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
+    acceptable_query = {'$and' => [fulltext_query, license_query, archive_query]}
 
     work_count = works_coll.count
     fulltext_ok_count = works_coll.count({:query => fulltext_query})
     license_ok_count = works_coll.count({:query => license_query})
     archive_ok_count = works_coll.count({:query => archive_query})
+    acceptable_count = works_coll.count({:query => acceptable_query})
     
     tallies_coll.update({:year => right_now.year, 
                           :month => right_now.month, 
@@ -79,7 +114,8 @@ module Aggregate
                           :work_count => work_count,
                           :work_count_ok_fulltext => fulltext_ok_count,
                           :work_count_ok_license => license_ok_count,
-                          :work_count_ok_archive => archive_ok_count},
+                          :work_count_ok_archive => archive_ok_count,
+                          :work_count_acceptable => acceptable_count},
                         {:upsert => true})
   end
 

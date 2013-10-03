@@ -2,41 +2,36 @@ require 'mongo'
 
 module DataConf
 
+  # Contains per day work metadata tallies
   def tallies_coll
     settings.db['tallies']
   end
 
+  # Contains work metadata
   def works_coll
     settings.db['works']
   end
 
+  # Contains info about the success/failure of collection attempts
   def collections_coll
     settings.db['collections']
   end
 
+  # Contains the latest breakdown per publisher
+  def publishers_coll
+    settings.db['publishers']
+  end
+
+  # Contains historic breakdowns per publisher
   def breakdowns_coll
     settings.db['breakdowns']
-  end
-
-  def license_breakdowns_coll
-    settings.db['license_breakdowns']
-  end
-
-  def archive_breakdowns_coll
-    settings.db['archive_breakdowns']
-  end
-
-  def fulltext_breakdowns_coll
-    settings.db['fulltext_breakdowns']
   end
 
   def ensure_indexes
     works_coll.ensure_index({:DOI => 1})
     tallies_coll.ensure_index({:year => 1, :month => 1, :day => 1})
-    breakdowns_coll.ensure_index({:year => 1, :month => 1, :day => 1})
-    license_breakdowns_coll.ensure_index({:year => 1, :month => 1, :day => 1})
-    fulltext_breakdowns_coll.ensure_index({:year => 1, :month => 1, :day => 1})
-    archive_breakdowns_coll.ensure_index({:year => 1, :month => 1, :day => 1})
+    publishers_coll.ensure_index({:prefix => 1, :year => 1, :month => 1, :day => 1})
+    breakdowns_coll.ensure_index({:prefix => 1, :year => 1, :month => 1, :day => 1})
   end
 
   def prepare_database config
