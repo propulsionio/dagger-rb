@@ -54,11 +54,10 @@ module Data::Collection
     publishers_coll.find({}).map do |doc|
       {
         :name => doc['name'],
-        :title => 'Publications',
         :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
         :measures => [doc['work_count']],
         :markers => [doc['work_count']],
-        :ranges => [0, 250, 500, 1000]
+        :ranges => [0, 250, 500, 1000, doc['work_count']]
       }
     end
   end
