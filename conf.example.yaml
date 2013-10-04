@@ -18,6 +18,9 @@ collection:
   interval: 1d
   retry-interval: 10m
   retry-attempts: 10
+  prefixes:
+    include: [10.1103, 10.1021, 10.1063, 10.1016,
+              10.1093, 10.1109, 10.1002]
 
 module:
   - name: license

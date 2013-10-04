@@ -50,6 +50,28 @@ module Aggregate
     end
   end
 
+  def apply_work_rules collection, works
+    if collection['prefixes']['include']
+      include_list = collection['prefixes']['include'].map do |prefix|
+        "http://id.crossref.org/prefix/#{prefix}"
+      end
+
+      works.reject do |work|
+        !include_list.include?(work['prefix'])
+      end
+    elsif collection['prefixes']['exclude']
+      exclude_list = collection['prefixes']['exclude'].map do |prefix|
+        "http://id.crossref.org/prefix/#{prefix}"
+      end
+
+      works.reject do |work|
+        exclude_list.include?(work['prefix'])
+      end
+    else
+      works
+    end
+  end
+
   def collect_works collection, offset
     conn = Faraday.new({:url => collection['server']})
     rows = collection['rows-per-request']
@@ -70,7 +92,7 @@ module Aggregate
           insert_success
           success = true
         else
-          insert_works(works)
+          insert_works(apply_work_rules(collection, works))
         end
       else
         insert_failure(response.status)
