@@ -14,7 +14,11 @@ helpers do
 
   def jsonp structure
     content_type 'application/json'
-    "#{params[:callback]}(#{structure.to_json});"
+    if params[:callback]
+      "#{params[:callback]}(#{structure.to_json});"
+    else
+      structure.to_json
+    end
   end
 end
 
