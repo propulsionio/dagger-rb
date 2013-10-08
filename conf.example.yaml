@@ -25,7 +25,8 @@ collection:
 module:
   - name: license
     acceptable:
-      - http://creativecommons.org/licenses/by/3.0/
+      - http://creativecommons.org/licenses/by/3.0/deed.en_US
+      - http://link.aps.org/licenses/aps-default-license
   - name: fulltext
   - name: archive
     acceptable:

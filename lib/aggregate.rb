@@ -124,7 +124,7 @@ module Aggregate
 
     # TODO Improve to include version (am, vor), max days from publication
     # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
-    ok_license_query = {:license => {'$in' => modules['license']['acceptable']}}
+    ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
     ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
     acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
 
@@ -166,7 +166,8 @@ module Aggregate
   end
 
   def do_works config, scheduler, retries
-    puts "Running work collection (try #{retries})"
+    puts "Attempting work sync (retry #{retries})"
+
     success = collect_works(config['collection'], 0)
     
     if success
