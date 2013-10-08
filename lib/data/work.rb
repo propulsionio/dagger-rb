@@ -7,7 +7,6 @@ module Data::Work
 
   def insert_works works
     works.each do |work|
-      puts work
       works_coll.update({:DOI => work['DOI']}, work, {:upsert => true})
     end
   end
