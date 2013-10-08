@@ -116,28 +116,52 @@ module Aggregate
     # reverse - group by funder
     aggregate_publishers(modules, right_now)
 
-    fulltext_query = {'link' => {'$exists' => true}}
-    license_query = {:license => {'$in' => modules['license']['acceptable']}}
-    archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
-    acceptable_query = {'$and' => [fulltext_query, license_query, archive_query]}
+    missing_license_query = {:license => {'$exists' => false}}
+    missing_archive_query = {:archive => {'$exists' => false}}
+    missing_fulltext_query = {:link => {'$exists' => false}}
+
+    has_fulltext_query = {:link => {'$exists' => true}}
+
+    # TODO Improve to include version (am, vor), max days from publication
+    # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
+    ok_license_query = {:license => {'$in' => modules['license']['acceptable']}}
+    ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
+    acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
 
     work_count = works_coll.count
-    fulltext_ok_count = works_coll.count({:query => fulltext_query})
-    license_ok_count = works_coll.count({:query => license_query})
-    archive_ok_count = works_coll.count({:query => archive_query})
+    fulltext_ok_count = works_coll.count({:query => has_fulltext_query})
+    license_ok_count = works_coll.count({:query => ok_license_query})
+    archive_ok_count = works_coll.count({:query => ok_archive_query})
     acceptable_count = works_coll.count({:query => acceptable_query})
+
+    fulltext_missing_count = works_coll.count({:query => missing_fulltext_query})
+    license_missing_count = works_coll.count({:query => missing_license_query})
+    archive_missing_count = works_coll.count({:query => missing_archive_query})
+
+    fulltext_bad_count = work_count - (fulltext_missing_count + fulltext_ok_count)
+    license_bad_count = work_count - (license_missing_count + license_ok_count)
+    archive_bad_count = work_count - (archive_missing_count + archive_ok_count)
+
+    unacceptable_count = work_count - acceptable_count
     
-    tallies_coll.update({:year => right_now.year, 
-                          :month => right_now.month, 
+    tallies_coll.update({:year => right_now.year,
+                          :month => right_now.month,
                           :day => right_now.day},
                         {:year => right_now.year,
                           :month => right_now.month,
                           :day => right_now.day,
                           :work_count => work_count,
+                          :work_count_bad_fulltext => fulltext_bad_count,
+                          :work_count_bad_license => license_bad_count,
+                          :work_count_bad_archive => archive_bad_count,
+                          :work_count_missing_fulltext => fulltext_missing_count,
+                          :work_count_missing_license => license_missing_count,
+                          :work_count_missing_archive => archive_missing_count,
                           :work_count_ok_fulltext => fulltext_ok_count,
                           :work_count_ok_license => license_ok_count,
                           :work_count_ok_archive => archive_ok_count,
-                          :work_count_acceptable => acceptable_count},
+                          :work_count_acceptable => acceptable_count,
+                          :work_count_unacceptable => unacceptable_count},
                         {:upsert => true})
   end
 

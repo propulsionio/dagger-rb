@@ -56,9 +56,9 @@ module Data::Collection
 
     ['fulltext', 'license', 'archive'].each do |k|
       values = []
-      values << {:label => 'OK', :value => 0}
-      values << {:label => 'Unknown', :value => latest['work_count'] - latest["work_count_ok_#{k}"]}
-      values << {:label => 'Not OK', :value => 0}
+      values << {:label => 'OK', :value => latest["work_count_ok_#{k}"]}
+      values << {:label => 'Unknown', :value => latest["work_count_missing_#{k}"]}
+      values << {:label => 'Not OK', :value => latest["work_count_bad_#{k}"]}
 
       pies[k] = [{:key => k, :values => values}]
     end
