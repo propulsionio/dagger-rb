@@ -143,7 +143,7 @@ module Aggregate
     archive_bad_count = work_count - (archive_missing_count + archive_ok_count)
 
     unacceptable_count = work_count - acceptable_count
-    
+
     tallies_coll.update({:year => right_now.year,
                           :month => right_now.month,
                           :day => right_now.day},
@@ -166,15 +166,19 @@ module Aggregate
   end
 
   def do_works config, scheduler, retries
-    puts "Attempting work sync (retry #{retries})"
-
-    success = collect_works(config['collection'], 0)
-    
-    if success
-      aggregate_works(config['module'])
-    elsif retries < config['collection']['retry-attempts']
-      scheduler.in(config['collection']['retry-interval']) do
-        do_works(config, scheduler, retries + 1)
+    if File.exists?('tmp/pause.txt')
+      puts 'Skipping work sync due to tmp/pause.txt file'
+    else
+      puts "Attempting work sync (retry #{retries})"
+      
+      success = collect_works(config['collection'], 0)
+      
+      if success
+        aggregate_works(config['module'])
+      elsif retries < config['collection']['retry-attempts']
+        scheduler.in(config['collection']['retry-interval']) do
+          do_works(config, scheduler, retries + 1)
+        end
       end
     end
   end
