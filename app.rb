@@ -53,3 +53,12 @@ end
 get '/collections' do
   jsonp(fetch_collections)
 end
+
+get '/tally-table' do
+  jsonp(fetch_tally_table)
+end
+
+get '/publisher-table' do
+  jsonp(fetch_publisher_table)
+end
+

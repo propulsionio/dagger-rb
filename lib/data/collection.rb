@@ -84,4 +84,39 @@ module Data::Collection
     end
   end
 
+  def fetch_tally_table
+    date_sort = [['year', 1], ['month', 1], ['day', 1]]
+    tallies = tallies_coll.find({}, {:sort => date_sort}).map do |doc|
+      ["#{doc['year']}-#{doc['month']}-#{doc['day']}",
+       doc['work_count'],
+       doc['work_count_ok_archive'],
+       doc['work_count_missing_archive'],
+       doc['work_count_bad_archive'],
+       doc['work_count_ok_fulltext'],
+       doc['work_count_missing_fulltext'],
+       doc['work_count_bad_fulltext'],
+       doc['work_count_ok_license'],
+       doc['work_count_missing_license'],
+       doc['work_count_bad_license'],
+       doc['work_count_acceptable']]
+    end
+  end
+
+  def fetch_publisher_table
+    publishers_coll.find({}).map do |doc|
+      [doc['name'],
+       doc['work_count'],
+       doc['work_count_ok_archive'],
+       doc['work_count_missing_archive'],
+       doc['work_count_bad_archive'],
+       doc['work_count_ok_fulltext'],
+       doc['work_count_missing_fulltext'],
+       doc['work_count_bad_fulltext'],
+       doc['work_count_ok_license'],
+       doc['work_count_missing_license'],
+       doc['work_count_bad_license'],
+       doc['work_count_acceptable']]
+    end
+  end
+
 end
