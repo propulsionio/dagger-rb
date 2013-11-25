@@ -42,7 +42,52 @@ module Aggregate
         :day => right_now.day
       }
 
+      prefix_query = {:prefix => insert_doc[:prefix]}
+      
+      missing_license_query = {:license => {'$exists' => false}}.merge(prefix_query)
+      missing_archive_query = {:archive => {'$exists' => false}}.merge(prefix_query)
+      missing_fulltext_query = {:link => {'$exists' => false}}.merge(prefix_query)
+
+      has_fulltext_query = {:link => {'$exists' => true}}.merge(prefix_query)
+      
+      # TODO Improve to include version (am, vor), max days from publication
+      # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
+      ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
+        .merge(prefix_query)
+      ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
+        .merge(prefix_query)
+      acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
+      
+      work_count = works_coll.count({:query => prefix_query})
+      fulltext_ok_count = works_coll.count({:query => has_fulltext_query})
+      license_ok_count = works_coll.count({:query => ok_license_query})
+      archive_ok_count = works_coll.count({:query => ok_archive_query})
+      acceptable_count = works_coll.count({:query => acceptable_query})
+      
+      fulltext_missing_count = works_coll.count({:query => missing_fulltext_query})
+      license_missing_count = works_coll.count({:query => missing_license_query})
+      archive_missing_count = works_coll.count({:query => missing_archive_query})
+      
+      fulltext_bad_count = work_count - (fulltext_missing_count + fulltext_ok_count)
+      license_bad_count = work_count - (license_missing_count + license_ok_count)
+      archive_bad_count = work_count - (archive_missing_count + archive_ok_count)
+      
+      unacceptable_count = work_count - acceptable_count
+
       insert_doc = insert_doc.merge(today)
+        .merge({:work_count => work_count,
+                 :work_count_bad_fulltext => fulltext_bad_count,
+                 :work_count_bad_license => license_bad_count,
+                 :work_count_bad_archive => archive_bad_count,
+                 :work_count_missing_fulltext => fulltext_missing_count,
+                 :work_count_missing_license => license_missing_count,
+                 :work_count_missing_archive => archive_missing_count,
+                 :work_count_ok_fulltext => fulltext_ok_count,
+                 :work_count_ok_license => license_ok_count,
+                 :work_count_ok_archive => archive_ok_count,
+                 :work_count_acceptable => acceptable_count,
+                 :work_count_unacceptable => unacceptable_count})
+
       breakdowns_coll.update({:prefix => insert_doc[:prefix]}.merge(today), 
                              insert_doc, {:upsert => true})
       publishers_coll.update({:prefix => insert_doc[:prefix]}, 
