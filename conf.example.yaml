@@ -3,12 +3,12 @@ mongo:
   host: 127.0.0.1
 #  port: 27015
 
-api:
-  port: 8080
-
 branding:
   org: Agency X
-  title: Agency X CHORUS DOI KPI API UI
+  title: Agency X Publications Dashboard
+  links:
+    - url: http://search.chorusaccess.org/chorus?q=100000015
+      label: View records in CHORUS Search
 
 collection:
   server: http://api.crossref.org
@@ -30,4 +30,4 @@ module:
   - name: fulltext
   - name: archive
     acceptable:
-      - clockss
+      - dwt
