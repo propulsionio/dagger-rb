@@ -9,6 +9,9 @@ branding:
   links:
     - url: http://search.chorusaccess.org/chorus?q=100000015
       label: View records in CHORUS Search
+  footer-links:
+    - url: http://chorusaccess.org/contact-us
+      label: Leave feedback
 
 collection:
   server: http://api.crossref.org
@@ -28,6 +31,13 @@ module:
       - http://creativecommons.org/licenses/by/3.0/deed.en_US
       - http://link.aps.org/licenses/aps-default-license
   - name: fulltext
+    validate: true
   - name: archive
+    validate: true
     acceptable:
-      - dwt
+      - DWT
+
+archive:
+  - name: DWT
+    url: http://deepwebtech.com/archive/{{DOI}}
+
