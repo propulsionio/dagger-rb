@@ -1,43 +1,150 @@
+# Example configuration of dagger-rb.
+# -------------------------------------------------------------------------
+#
+# Please read through this file and make alterations as required. This file 
+# should be renamed to 'conf.yaml'.
+#
+# The configuration is split into 5 sections:
+#
+# - mongo
+#     Describe location of a MongoDB database. The database will be used
+#     to store DOI aggregation data.  
+# - branding
+#     Branding information for the dagger web UI. Define text, additional
+#     header links and footer links. 
+# - collection
+#     Defines where DOI data is collected from, and how often collection
+#     occurs.
+# - module
+#     Declares acceptance criteria for three facets of DOIs; full-text
+#     links, archive arrangements and license information.
+# - archive
+#     Defines how to check the validity of a DOI archive arrangement with
+#     particular archives.
+
+# -------------------------------------------------------------------------
+# mongo
+#   required: db, host
+#   optional: port
+#   
+#   The database chosen must not be written to by any other process,
+#   unless you know what you're doing.
+#
 mongo:
   db: agencyx
   host: 127.0.0.1
-#  port: 27015
+  # Mongo DB port is optional:
+  # port: 27015
 
+# -------------------------------------------------------------------------
+# branding
+#   required: org, title
+#   optional: links, footer-links
+#   
+#   Branding information is used to construct some of the text on HTML
+#   pages in the dagger-ui web client. 'title' is used as the page title.
+#   'links' describes a list of links that appear prominently in the
+#   dashboard's header, 'footer-links' describes a list of less prominent
+#   links that appear in the footer of each page.
+#
 branding:
   org: Agency X
   title: Agency X Publications Dashboard
-  links:
-    - url: http://search.chorusaccess.org/chorus?q=100000015
-      label: View records in CHORUS Search
-  footer-links:
-    - url: http://chorusaccess.org/contact-us
-      label: Leave feedback
+  #
+  # Example links and footer-links. Each is an array of objects that must
+  # each contain a url and label:
+  #
+  # links:
+  #   - url: http://search.chorusaccess.org/chorus?q=100000015
+  #     label: View records in CHORUS Search
+  # footer-links:
+  #   - url: http://chorusaccess.org/contact-us
+  #     label: Leave feedback
 
+# -------------------------------------------------------------------------
+# collection
+#   required: server, type, id, rows-per-request, interval, retry-interval,
+#             retry-attempts
+#   optional: prefixes.include, prefixes.exclude
+#
+#   Declare when and how DOI metadata should be collected. 
+#
 collection:
+  # Under most circumstances the CrossRef API url should not change.
   server: http://api.crossref.org
+
+  # Currently, only 'funder' look ups are supported.
   type: funder
+
+  # The ID of the funder. All DOIs funded by this funder (according to 
+  # FundRef information) will be collected and aggregated.
   id: 100000015
+
+  # There should be no reason to change this parameter. Defines how many 
+  # DOIs are requested per request to the CrossRef API.
   rows-per-request: 200
+
+  # Specify how often DOI aggregation should occur. Aggregated data is
+  # stored on a once-per-day basis so intervals less than a day will
+  # result in aggregation data being overwritten. The CrossRef API
+  # currently indexes data once per day, so there is little reason to have 
+  # an interval less than a day.
   interval: 1d
+
+  # If a DOI look up fails, dagger-rb will wait `retry-interval` until
+  # making another attempt to collect the same DOIs.
   retry-interval: 10m
+
+  # dagger-ui will try at most `retry-attempts` times to collect DOIs
+  # before it gives up until the next update interval trigger.
   retry-attempts: 10
+
+  # Specify an optional list of DOI prefixes to include or exclude from
+  # DOI aggregation.
   prefixes:
     include: [10.1103, 10.1021, 10.1063, 10.1016,
               10.1093, 10.1109, 10.1002]
+    # exclude: [10.5555]
 
+# -------------------------------------------------------------------------
+# module
+#   array of any three objects with name: license, fulltext, archive
+#
+#   Each module should have a name and some additional parameters.
+#
 module:
+  # The `license` module must declare a list of acceptable license URLs.
   - name: license
     acceptable:
       - http://creativecommons.org/licenses/by/3.0/deed.en_US
       - http://link.aps.org/licenses/aps-default-license
+
+  # The 'fulltext' module may optionally specify that fulltext links must
+  # be checked for resolution (HTTP 200 response on request):
   - name: fulltext
     validate: true
+
+  # The 'archive' module must specify a list of acceptable archives. It
+  # may optionally specify `validate: true` if DOIs should be checked
+  # for existence in archives via archive look up APIs.
   - name: archive
     validate: true
+
+    # The list of acceptable archive names should match how names appear
+    # in the CrossRef common deposit XSD, archive element, name property 
+    # enumeration.
     acceptable:
       - DWT
 
+# -------------------------------------------------------------------------
+# archive
+#   optional array of archive name, url pairs
+#
+#   When the `archive` module option `validate` is set to true, each DOI
+#   will be checked for existence in archives via archive lookup APIs.
+#   For each acceptable archive, a lookup URL should be specified, 
+#   containing the token `{{DOI}}`.
 archive:
   - name: DWT
-    url: http://deepwebtech.com/archive/{{DOI}}
+    url: http://deepwebtech.com/status?doi={{DOI}}
 
