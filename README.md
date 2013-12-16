@@ -34,7 +34,7 @@ template configuration can be found in [ `conf.example.yaml` ](conf.example.yaml
 
 For information on the YAML file format see the [ YAML homepage ](http://yaml.org).
 
-### Archive APIs
+### Archive Lookup APIs
 
 Archives may implement an API that allows anyone to lookup a DOI to perform
 an archived check. The DOI lookup API consists of a single URL that embeds
