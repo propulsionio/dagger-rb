@@ -25,7 +25,7 @@ The DOI aggregator middleware, in Ruby.
     $ git clone https://github.com/CrossRef/dagger-ui.git
 
 8. Configure the dagger-ui project to point to your dagger middleware
-   instance (in the `/js/config.js` file.)
+   instance (in the [ `/js/config.js` ](https://github.com/CrossRef/dagger-ui/blob/master/js/config.js) file.)
 
 ## Configuration
 
