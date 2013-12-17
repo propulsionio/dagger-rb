@@ -65,7 +65,7 @@ branding:
 # collection
 #   required: server, type, id, rows-per-request, interval, retry-interval,
 #             retry-attempts
-#   optional: prefixes.include, prefixes.exclude
+#   optional: prefixes.include, prefixes.exclude, custom-filters
 #
 #   Declare when and how DOI metadata should be collected. 
 #
@@ -75,6 +75,14 @@ collection:
 
   # Currently, only 'funder' look ups are supported.
   type: funder
+
+  # Other filters that will be applied to the call to the CrossRef API 
+  # /works route. See http://api.crossref.org/help for details of
+  # additional filters. Must be a comma separated list of filters.
+  #
+  # The example below would make the dashboard consider records published
+  # on or after 2013-01-01:
+  # custom-filters: from-pub-date:2013-01-01
 
   # The ID of the funder. All DOIs funded by this funder (according to 
   # FundRef information) will be collected and aggregated.
