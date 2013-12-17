@@ -16,14 +16,14 @@ module Aggregate
     query_str = ""
 
     if collection['custom-filters']
-      query_str = "filter=#{collection['custom-filters']}"
+      query_str = "?filter=#{collection['custom-filters']}"
     end
 
     case collection['type']
     when 'funder'
-      "/v1/funders/#{collection['id']}/works?#{query_str}"
+      "/v1/funders/#{collection['id']}/works#{query_str}"
     when 'publisher'
-      "/v1/publishers/#{collection['id']}/works?#{query_str}"
+      "/v1/publishers/#{collection['id']}/works#{query_str}"
     end
   end
 
