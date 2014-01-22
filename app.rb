@@ -13,10 +13,11 @@ helpers do
   include Data::Collection
 
   def jsonp structure
-    content_type 'application/json'
     if params[:callback]
+      content_type 'text/javascript'
       "#{params[:callback]}(#{structure.to_json});"
     else
+      content_type 'application/json'
       structure.to_json
     end
   end
