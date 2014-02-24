@@ -111,7 +111,7 @@ collection:
   # DOI aggregation.
   prefixes:
     include: [10.1103, 10.1021, 10.1063, 10.1016,
-              10.1093, 10.1109, 10.1002]
+              10.1093, 10.1109, 10.1002, 10.1126]
     # exclude: [10.5555]
 
 # -------------------------------------------------------------------------
@@ -124,8 +124,18 @@ module:
   # The `license` module must declare a list of acceptable license URLs.
   - name: license
     acceptable:
+      - http://www.sciencemag.org/site/feature/contribinfo/prep/license.xhtml
+      - http://www.acs.org/content/acs/en/copyright.html
+      - http://pubs.acs.org/userimages/ContentEditor/1388526979973/authorchoice_form.pdf
       - http://creativecommons.org/licenses/by/3.0/deed.en_US
       - http://link.aps.org/licenses/aps-default-license
+      - http://link.aps.org/licenses/aps-default-accepted-manuscript-license
+      - http://link.aps.org/licenses/aps-default-text-mining-license
+      - http://creativecommons.org/licenses/by/3.0/deed.en_US
+      - http://www.elsevier.com/open-access/userlicense/1.0/
+      - http://www.ieee.org/publications_standards/publications/subscriptions/info/licensing.html
+      - http://creativecommons.org/licenses/by-nc/3.0
+      - http://olabout.wiley.com/WileyCDA/Section/id-815641.html
 
   # The 'fulltext' module may optionally specify that fulltext links must
   # be checked for resolution (HTTP 200 response on request):
