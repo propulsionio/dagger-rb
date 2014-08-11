@@ -131,10 +131,7 @@ module Aggregate
     begin
       works = []
       response = conn.get do |req|
-        req.url(make_collection_path(collection))
-        req.headers['Accept'] = 'application/json'
-        req.headers['Content-Type'] = 'application/json'
-        req.body = {:offset => offset, :rows => rows}.to_json
+        req.url(make_collection_path(collection) << "&offset=#{offset}&rows=#{rows}")
       end
 
       if response.success?
