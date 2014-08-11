@@ -12,7 +12,10 @@ module Data::Collection
 
   def fetch_tallies
     date_sort = [['year', 1], ['month', 1], ['day', 1]]
-    tallies = tallies_coll.find({}, {:sort => date_sort}).map do |tally_doc|
+    tallies = tallies_coll.find(
+      { :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => 8 } }, { day: { :$gte => 1 } } ] },
+      { sort: date_sort }
+    ).map do |tally_doc|
       {
         :date => {
           :year => tally_doc['year'],
