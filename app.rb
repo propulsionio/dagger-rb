@@ -36,31 +36,31 @@ configure do
   end
 end
 
-get '/data/:agency/tallies' do
+get '/:agency/tallies' do
   jsonp fetch_tallies(params[:agency])
 end
 
-get '/data/:agency/breakdowns' do
+get '/:agency/breakdowns' do
   jsonp fetch_breakdowns(params[:agency])
 end
 
-get '/data/:agency/publishers' do
+get '/:agency/publishers' do
   jsonp fetch_publishers(params[:agency])
 end
 
-get '/data/:agency/branding' do
+get '/:agency/branding' do
   jsonp settings.send("#{params[:agency]}_branding")
 end
 
-get '/data/:agency/collections' do
+get '/:agency/collections' do
   jsonp fetch_collections(params[:agency])
 end
 
-get '/data/:agency/tally-table' do
+get '/:agency/tally-table' do
   jsonp fetch_tally_table(params[:agency])
 end
 
-get '/data/:agency/publisher-table' do
+get '/:agency/publisher-table' do
   jsonp fetch_publisher_table(params[:agency])
 end
 
