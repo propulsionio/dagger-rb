@@ -49,13 +49,13 @@ module Aggregate
       }
 
       prefix_query = {:prefix => insert_doc[:prefix]}
-      
+
       missing_license_query = {:license => {'$exists' => false}}.merge(prefix_query)
       missing_archive_query = {:archive => {'$exists' => false}}.merge(prefix_query)
       missing_fulltext_query = {:link => {'$exists' => false}}.merge(prefix_query)
 
       has_fulltext_query = {:link => {'$exists' => true}}.merge(prefix_query)
-      
+
       # TODO Improve to include version (am, vor), max days from publication
       # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
       ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
@@ -63,21 +63,21 @@ module Aggregate
       ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
         .merge(prefix_query)
       acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
-      
+
       work_count = works_coll.count({:query => prefix_query})
       fulltext_ok_count = works_coll.count({:query => has_fulltext_query})
       license_ok_count = works_coll.count({:query => ok_license_query})
       archive_ok_count = works_coll.count({:query => ok_archive_query})
       acceptable_count = works_coll.count({:query => acceptable_query})
-      
+
       fulltext_missing_count = works_coll.count({:query => missing_fulltext_query})
       license_missing_count = works_coll.count({:query => missing_license_query})
       archive_missing_count = works_coll.count({:query => missing_archive_query})
-      
+
       fulltext_bad_count = work_count - (fulltext_missing_count + fulltext_ok_count)
       license_bad_count = work_count - (license_missing_count + license_ok_count)
       archive_bad_count = work_count - (archive_missing_count + archive_ok_count)
-      
+
       unacceptable_count = work_count - acceptable_count
 
       insert_doc = insert_doc.merge(today)
@@ -94,9 +94,9 @@ module Aggregate
                  :work_count_acceptable => acceptable_count,
                  :work_count_unacceptable => unacceptable_count})
 
-      breakdowns_coll.update({:prefix => insert_doc[:prefix]}.merge(today), 
+      breakdowns_coll.update({:prefix => insert_doc[:prefix]}.merge(today),
                              insert_doc, {:upsert => true})
-      publishers_coll.update({:prefix => insert_doc[:prefix]}, 
+      publishers_coll.update({:prefix => insert_doc[:prefix]},
                              insert_doc, {:upsert => true})
     end
   end
@@ -145,7 +145,7 @@ module Aggregate
       else
         insert_failure(response.status)
       end
-    
+
       offset = offset + rows
     end while !works.empty?
 
@@ -159,7 +159,7 @@ module Aggregate
     end
 
     right_now = DateTime.now
-    
+
     # When collection type of :publisher is chosen, this should do the
     # reverse - group by funder
     aggregate_publishers(modules, right_now)
@@ -218,9 +218,9 @@ module Aggregate
       puts 'Skipping work sync due to tmp/pause.txt file'
     else
       puts "Attempting work sync (retry #{retries})"
-      
+
       success = collect_works(config['collection'], 0)
-      
+
       if success
         aggregate_works(config['module'])
       elsif retries < config['collection']['retry-attempts']

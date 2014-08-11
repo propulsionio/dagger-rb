@@ -34,9 +34,9 @@ module Data::Collection
     [:total, :fulltext, :license, :archive, :acceptable].each do |count_val|
       series << {
         :key => count_val,
-        :values => tallies.map do |d| 
-          dt = Date.new(d[:date][:year], 
-                        d[:date][:month], 
+        :values => tallies.map do |d|
+          dt = Date.new(d[:date][:year],
+                        d[:date][:month],
                         d[:date][:day]).to_time.to_i * 1000
           {:x => dt, :y => d[:count][count_val]}
         end
