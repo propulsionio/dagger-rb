@@ -67,7 +67,7 @@ module Data::Collection
   end
 
   def fetch_publishers
-    publishers_coll.find({}).map do |doc|
+    publishers = publishers_coll.find({}).map do |doc|
       {
         :name => doc['name'],
         :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
@@ -76,6 +76,18 @@ module Data::Collection
         :ranges => [0, 250, 500, 1000, doc['work_count']]
       }
     end
+    wiley_blackwell_publishers = publishers.select { |publisher| publisher[:name] == 'Wiley-Blackwell' }
+    wiley_blackwell_total_work_count =  wiley_blackwell_publishers.inject(0) do |work_count, hash|
+                                          work_count += hash[:measures][0]
+                                          work_count
+                                        end
+    wiley_blackwell_publisher = wiley_blackwell_publishers.first
+    wiley_blackwell_publisher.delete(:prefix)
+    wiley_blackwell_publisher.merge!({:measures => [wiley_blackwell_total_work_count],
+                                      :markers => [wiley_blackwell_total_work_count],
+                                      :ranges => [0, 250, 500, 1000, wiley_blackwell_total_work_count]})
+    publishers = publishers.reject { |publisher| publisher[:name] == 'Wiley-Blackwell' }
+    publishers + [wiley_blackwell_publisher]
   end
 
   def fetch_collections
