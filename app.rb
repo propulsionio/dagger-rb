@@ -27,39 +27,40 @@ configure do
   include Configuration
   include DataConf
   include Aggregate
-  
-  config = load_configuration('conf.yaml')
-  prepare_database(config)
-  prepare_schedule(config)
 
-  set :branding, config['branding']
+  load_configuration('conf.yaml').each do |agency, config|
+    prepare_database(agency, config)
+    prepare_schedule(agency, config)
+
+    set "#{agency}_branding", config['branding']
+  end
 end
 
-get '/tallies' do
-  jsonp(fetch_tallies)
+get '/data/:agency/tallies' do
+  jsonp fetch_tallies(params[:agency])
 end
 
-get '/breakdowns' do
-  jsonp(fetch_breakdowns)
+get '/data/:agency/breakdowns' do
+  jsonp fetch_breakdowns(params[:agency])
 end
 
-get '/publishers' do
-  jsonp(fetch_publishers)
+get '/data/:agency/publishers' do
+  jsonp fetch_publishers(params[:agency])
 end
 
-get '/branding' do
-  jsonp(settings.branding)
+get '/data/:agency/branding' do
+  jsonp settings.send("#{params[:agency]}_branding")
 end
 
-get '/collections' do
-  jsonp(fetch_collections)
+get '/data/:agency/collections' do
+  jsonp fetch_collections(params[:agency])
 end
 
-get '/tally-table' do
-  jsonp(fetch_tally_table)
+get '/data/:agency/tally-table' do
+  jsonp fetch_tally_table(params[:agency])
 end
 
-get '/publisher-table' do
-  jsonp(fetch_publisher_table)
+get '/data/:agency/publisher-table' do
+  jsonp fetch_publisher_table(params[:agency])
 end
 

@@ -2,17 +2,17 @@ require 'mongo'
 
 module Data::Collection
 
-  def insert_success
-    collections_coll.insert({:at => Time.now, :success => true})
+  def insert_success agency
+    collections_coll(agency).insert({:at => Time.now, :success => true})
   end
 
-  def insert_failure code
-    collections_coll.insert({:at => Time.now, :success => false, :http_code => code})
+  def insert_failure agency, code
+    collections_coll(agency).insert({:at => Time.now, :success => false, :http_code => code})
   end
 
-  def fetch_tallies
+  def fetch_tallies agency
     date_sort = [['year', 1], ['month', 1], ['day', 1]]
-    tallies = tallies_coll.find(
+    tallies = tallies_coll(agency).find(
       { :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => 8 } }, { day: { :$gte => 1 } } ] },
       { sort: date_sort }
     ).map do |tally_doc|
@@ -52,9 +52,9 @@ module Data::Collection
     }
   end
 
-  def fetch_breakdowns
+  def fetch_breakdowns agency
     date_sort = [['year', -1], ['month', -1], ['day', -1]]
-    latest = tallies_coll.find_one({}, {:sort => date_sort})
+    latest = tallies_coll(agency).find_one({}, {:sort => date_sort})
     pies = {}
 
     ['fulltext', 'license', 'archive'].each do |k|
@@ -69,8 +69,8 @@ module Data::Collection
     pies
   end
 
-  def fetch_publishers
-    publishers = publishers_coll.find({}).map do |doc|
+  def fetch_publishers agency
+    publishers = publishers_coll(agency).find({}).map do |doc|
       {
         :name => doc['name'],
         :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
@@ -93,15 +93,15 @@ module Data::Collection
     publishers + [wiley_blackwell_publisher]
   end
 
-  def fetch_collections
-    collections_coll.find({}, {:sort => ['at', -1]}).map do |doc|
+  def fetch_collections agency
+    collections_coll(agency).find({}, {:sort => ['at', -1]}).map do |doc|
       {:at => doc['at'], :success => doc['success'], :http_code => doc['http_code']}
     end
   end
 
-  def fetch_tally_table
+  def fetch_tally_table agency
     date_sort = [['year', 1], ['month', 1], ['day', 1]]
-    tallies = tallies_coll.find({}, {:sort => date_sort}).map do |doc|
+    tallies = tallies_coll(agency).find({}, {:sort => date_sort}).map do |doc|
       ["#{doc['year']}-#{doc['month']}-#{doc['day']}",
        doc['work_count'],
        doc['work_count_ok_archive'],
@@ -117,8 +117,8 @@ module Data::Collection
     end
   end
 
-  def fetch_publisher_table
-    publishers_coll.find({}).map do |doc|
+  def fetch_publisher_table agency
+    publishers_coll(agency).find({}).map do |doc|
       [doc['name'],
        doc['work_count'],
        doc['work_count_ok_archive'],
