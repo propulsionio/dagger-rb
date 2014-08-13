@@ -36,6 +36,14 @@ configure do
   end
 end
 
+post '/:agency/works' do
+  headers 'Access-Control-Allow-Origin' => '*',
+          'Access-Control-Allow-Methods' => ['POST'],
+          'Access-Control-Allow-Headers' => 'Content-Type'
+  options = { :url_accessible => params[:url_accessible] }
+  status (update_work(params[:agency], params[:doi], options) ? 200 : 404)
+end
+
 get '/:agency/tallies' do
   jsonp fetch_tallies(params[:agency])
 end

@@ -11,4 +11,7 @@ module Data::Work
     end
   end
 
+  def update_work agency, doi, options
+    works_coll(agency).update({:DOI => doi}, {"$set" => options})["updatedExisting"]
+  end
 end
