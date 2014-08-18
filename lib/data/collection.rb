@@ -91,6 +91,7 @@ module Data::Collection
                                       :ranges => [0, 250, 500, 1000, wiley_blackwell_total_work_count]})
     publishers = publishers.reject { |publisher| publisher[:name] == 'Wiley-Blackwell' }
     publishers + [wiley_blackwell_publisher]
+    publishers.sort_by { |publisher| publisher[:name] }
   end
 
   def fetch_collections agency
