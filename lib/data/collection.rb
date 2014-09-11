@@ -79,6 +79,13 @@ module Data::Collection
         :ranges => [0, 250, 500, 1000, doc['work_count']]
       }
     end
+
+    publishers.each { |publisher| 
+      if(publisher[:name] == 'American Institute of Physics (AIP)') then 
+        publisher[:name] = "AIP Publishing" 
+      end
+    };
+    
     wiley_blackwell_publishers = publishers.select { |publisher| publisher[:name] == 'Wiley-Blackwell' }
     wiley_blackwell_total_work_count =  wiley_blackwell_publishers.inject(0) do |work_count, hash|
                                           work_count += hash[:measures][0]
