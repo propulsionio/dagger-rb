@@ -1,0 +1,6 @@
+192.168.1.9 - - [15/Sep/2014 00:50:21] "GET /nist/branding?callback=angular.callbacks._0 HTTP/1.0" 200 304 0.1112
+192.168.1.9 - - [15/Sep/2014 00:50:21] "GET /nist/tallies?callback=angular.callbacks._1 HTTP/1.0" 200 1120 0.0065
+192.168.1.9 - - [15/Sep/2014 00:50:21] "GET /nist/breakdowns?callback=angular.callbacks._2 HTTP/1.0" 200 407 0.0099
+192.168.1.9 - - [15/Sep/2014 00:50:21] "GET /nist/publishers?callback=angular.callbacks._3 HTTP/1.0" 200 754 0.0050
+192.168.1.9 - - [15/Sep/2014 00:50:27] "GET /nist/tally-table?callback=angular.callbacks._4 HTTP/1.0" 200 285 0.0077
+192.168.1.9 - - [15/Sep/2014 00:50:27] "GET /nist/publisher-table?callback=angular.callbacks._5 HTTP/1.0" 200 437 0.0046
