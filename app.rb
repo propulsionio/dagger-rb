@@ -33,6 +33,7 @@ configure do
     prepare_schedule(agency, config)
 
     set "#{agency}_branding", config['branding']
+    set "#{agency}_modules", config['module'];
   end
 end
 
@@ -70,5 +71,9 @@ end
 
 get '/:agency/publisher-table' do
   jsonp fetch_publisher_table(params[:agency])
+end
+
+get '/:agency/publisher/:name' do
+  jsonp fetch_publisher_works(params, settings.send("#{params[:agency]}_modules"));
 end
 
