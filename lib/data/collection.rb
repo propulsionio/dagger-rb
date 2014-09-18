@@ -160,7 +160,6 @@ module Data::Collection
         when 'unknown'
           query = {:archive => {'$exists' => false}}
         when 'unacceptable'
-          puts 'In unacceptable'
           query = {'$and'=> [:archive => {'$exists' => true}]}
         end
 
@@ -202,7 +201,6 @@ module Data::Collection
 
     else
       works_coll(params[:agency]).find({:publisher=> params[:name]}).each do |doc|
-        puts doc;
         data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
       end
     end
@@ -213,13 +211,9 @@ module Data::Collection
     data = [];
     query = {};
 
-    #{ :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => 8 } }, { day: { :$gte => 1 } } ] },
-
     dateQuery = {:$and=> [{'indexed.date-parts.0.0' => {:$lte => params[:year].to_i}}, 
       {'indexed.date-parts.0.1' => {:$lte => params[:month].to_i}},
       {'indexed.date-parts.0.2' => {:$lte => params[:day].to_i}}]}
-
-    puts dateQuery;
 
     modules = modules.reduce({}) do |memo, obj|
       memo[obj['name']] = obj
@@ -235,7 +229,6 @@ module Data::Collection
         when 'unknown'
           query = {:archive => {'$exists' => false}}
         when 'unacceptable'
-          puts 'In unacceptable'
           query = {'$and'=> [:archive => {'$exists' => true}]}
         end
 
