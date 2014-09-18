@@ -77,3 +77,6 @@ get '/:agency/publisher/:name' do
   jsonp fetch_publisher_works(params, settings.send("#{params[:agency]}_modules"));
 end
 
+get '/:agency/tallies/:year/:month/:day' do
+  jsonp fetch_tally_works(params, settings.send("#{params[:agency]}_modules"));
+end

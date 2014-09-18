@@ -202,6 +202,83 @@ module Data::Collection
 
     else
       works_coll(params[:agency]).find({:publisher=> params[:name]}).each do |doc|
+        puts doc;
+        data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
+      end
+    end
+    data
+  end
+
+  def fetch_tally_works params, modules
+    data = [];
+    query = {};
+
+    #{ :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => 8 } }, { day: { :$gte => 1 } } ] },
+
+    dateQuery = {:$and=> [{'indexed.date-parts.0.0' => {:$lte => params[:year].to_i}}, 
+      {'indexed.date-parts.0.1' => {:$lte => params[:month].to_i}},
+      {'indexed.date-parts.0.2' => {:$lte => params[:day].to_i}}]}
+
+    puts dateQuery;
+
+    modules = modules.reduce({}) do |memo, obj|
+      memo[obj['name']] = obj
+      memo
+    end
+
+    if (params[:category] && !params[:category].eql?("all")) then
+
+      if(params[:category].eql?("archive")) then
+        case params[:subcategory]
+        when 'acceptable'
+          query = {:archive => {'$in' => modules['archive']['acceptable']}}
+        when 'unknown'
+          query = {:archive => {'$exists' => false}}
+        when 'unacceptable'
+          puts 'In unacceptable'
+          query = {'$and'=> [:archive => {'$exists' => true}]}
+        end
+
+      elsif(params[:category].eql?("fulltext")) then
+        case params[:subcategory]
+        when 'acceptable'
+          query = {:link => {'$exists' => true}}
+        when 'unknown'
+          query = {:link => {'$exists' => false}}
+        when 'unacceptable'
+          return data;
+        end
+
+      elsif(params[:category].eql?("license")) then
+        case params[:subcategory]
+        when 'acceptable'
+          query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
+        when 'unknown'
+          query = {:license => {'$exists' => false}}
+        when 'unacceptable'
+          query = {'$and'=> [:license => {'$exists' => true}, 'license.URL' => {'$nin' => modules['license']['acceptable']}]}
+        end
+
+      elsif (params[:category].eql?("total_acceptable"))
+        query = {'$and' => [{:link => {'$exists' => true}}, {'license.URL' => {'$in' => modules['license']['acceptable']}}, {:archive => {'$in' => modules['archive']['acceptable']}}]}
+      end
+
+
+
+      works_coll(params[:agency]).find(query.merge(dateQuery)).each do |doc|
+
+        if(params[:category].eql?("archive") && params[:subcategory].eql?("unacceptable")) then
+          if((modules['archive']['acceptable'] & doc['archive']).length == 0) then
+            data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
+          end
+        else
+          data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
+        end
+
+      end
+
+    else
+      works_coll(params[:agency]).find(dateQuery).each do |doc|
         data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
       end
     end
