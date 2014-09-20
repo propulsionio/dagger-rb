@@ -211,9 +211,9 @@ module Data::Collection
     data = [];
     query = {};
 
-    dateQuery = {:$and=> [{'indexed.date-parts.0.0' => {:$lte => params[:year].to_i}}, 
-      {'indexed.date-parts.0.1' => {:$lte => params[:month].to_i}},
-      {'indexed.date-parts.0.2' => {:$lte => params[:day].to_i}}]}
+    dateQuery = {:$and=> [{'deposited.date-parts.0.0' => {:$lte => params[:year].to_i}}, 
+      {'deposited.date-parts.0.1' => {:$lte => params[:month].to_i}},
+      {'deposited.date-parts.0.2' => {:$lte => params[:day].to_i}}]}
 
     modules = modules.reduce({}) do |memo, obj|
       memo[obj['name']] = obj
@@ -255,8 +255,6 @@ module Data::Collection
       elsif (params[:category].eql?("total_acceptable"))
         query = {'$and' => [{:link => {'$exists' => true}}, {'license.URL' => {'$in' => modules['license']['acceptable']}}, {:archive => {'$in' => modules['archive']['acceptable']}}]}
       end
-
-
 
       works_coll(params[:agency]).find(query.merge(dateQuery)).each do |doc|
 
