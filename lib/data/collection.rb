@@ -108,7 +108,7 @@ module Data::Collection
   end
 
   def fetch_tally_table agency
-    date_sort = [['year', 1], ['month', 1], ['day', 1]]
+    date_sort = [['year', -1], ['month', -1], ['day', -1]]
     tallies = tallies_coll(agency).find({}, {:sort => date_sort}).map do |doc|
       ["#{doc['year']}/#{doc['month']}/#{doc['day']}",
        doc['work_count'],
