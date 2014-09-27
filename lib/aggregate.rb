@@ -121,7 +121,7 @@ module Aggregate
     end
   end
 
-  def collect_works agency, collection, offset
+  def collect_works agency, collection, offset, modules
     conn = Faraday.new({:url => collection['server']})
     rows = collection['rows-per-request']
     success = false
@@ -138,7 +138,7 @@ module Aggregate
           insert_success agency
           success = true
         else
-          insert_works(agency, agencyly_work_rules(collection, works))
+          insert_works(agency, agencyly_work_rules(collection, works), modules)
         end
       else
         insert_failure(agency, response.status)
@@ -216,7 +216,7 @@ module Aggregate
     else
       puts "Attempting work sync (retry #{retries})"
 
-      success = collect_works(agency, config['collection'], 0)
+      success = collect_works(agency, config['collection'], 0, config['module'])
 
       if success
         aggregate_works(agency, config['module'])
