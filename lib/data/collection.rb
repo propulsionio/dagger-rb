@@ -210,69 +210,63 @@ module Data::Collection
   def fetch_tally_works params, modules
     data = [];
     query = {};
-
-    dateQuery = {:$and=> [{'deposited.date-parts.0.0' => {:$lte => params[:year].to_i}}, 
-      {'deposited.date-parts.0.1' => {:$lte => params[:month].to_i}},
-      {'deposited.date-parts.0.2' => {:$lte => params[:day].to_i}}]}
-
-    modules = modules.reduce({}) do |memo, obj|
-      memo[obj['name']] = obj
-      memo
-    end
-
-    if (params[:category] && !params[:category].eql?("all")) then
+    category = "";
+   
+    if (params[:category] && !params[:category].eql?("all") && !params[:category].eql?("total_acceptable")) then
 
       if(params[:category].eql?("archive")) then
         case params[:subcategory]
         when 'acceptable'
-          query = {:archive => {'$in' => modules['archive']['acceptable']}}
+          category = "ACCEPTABLE_ARCHIVE"
         when 'unknown'
-          query = {:archive => {'$exists' => false}}
+          category = "UNKNOWN_ARCHIVE"
         when 'unacceptable'
-          query = {'$and'=> [:archive => {'$exists' => true}]}
+          category = "UNACCEPTABLE_ARCHIVE"
         end
 
       elsif(params[:category].eql?("fulltext")) then
         case params[:subcategory]
         when 'acceptable'
-          query = {:link => {'$exists' => true}}
+          category = "ACCEPTABLE_FULLTEXT"
         when 'unknown'
-          query = {:link => {'$exists' => false}}
+          category = "UNKNOWN_FULLTEXT"
         when 'unacceptable'
-          return data;
+          category = "UNACCEPTABLE_FULLTEXT"
         end
 
       elsif(params[:category].eql?("license")) then
         case params[:subcategory]
         when 'acceptable'
-          query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
+          category = "ACCEPTABLE_LICENSE"
         when 'unknown'
-          query = {:license => {'$exists' => false}}
+          category = "UNKNOWN_LICENSE"
         when 'unacceptable'
-          query = {'$and'=> [:license => {'$exists' => true}, 'license.URL' => {'$nin' => modules['license']['acceptable']}]}
+          category = "UNACCEPTABLE_LICENSE"
         end
-
-      elsif (params[:category].eql?("total_acceptable"))
-        query = {'$and' => [{:link => {'$exists' => true}}, {'license.URL' => {'$in' => modules['license']['acceptable']}}, {:archive => {'$in' => modules['archive']['acceptable']}}]}
       end
 
-      works_coll(params[:agency]).find(query.merge(dateQuery)).each do |doc|
-
-        if(params[:category].eql?("archive") && params[:subcategory].eql?("unacceptable")) then
-          if((modules['archive']['acceptable'] & doc['archive']).length == 0) then
-            data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
-          end
-        else
-          data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
-        end
-
-      end
-
+      query = {'stats' => {:$elemMatch => 
+        {'date.date-parts.0' => params[:year].to_i, 
+        'date.date-parts.1' => params[:month].to_i,
+        'date.date-parts.2' => params[:day].to_i,
+        'categories' => category}}}
+    elsif (params[:category].eql?("total_acceptable")) then
+      query = {'stats' => {:$elemMatch => 
+        {'date.date-parts.0' => params[:year].to_i,
+        'date.date-parts.1' => params[:month].to_i,
+        'date.date-parts.2' => params[:day].to_i,
+        'categories' => {:$all => ["ACCEPTABLE_LICENSE", "ACCEPTABLE_FULLTEXT", "ACCEPTABLE_ARCHIVE"]}}}}
     else
-      works_coll(params[:agency]).find(dateQuery).each do |doc|
-        data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
-      end
+      query = {'stats' => {:$elemMatch => 
+        {'date.date-parts.0' => params[:year].to_i,
+        'date.date-parts.1' => params[:month].to_i,
+        'date.date-parts.2' => params[:day].to_i}}}
     end
+
+    works_coll(params[:agency]).find(query).each do |doc|
+      data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
+    end
+    
     data
   end
 

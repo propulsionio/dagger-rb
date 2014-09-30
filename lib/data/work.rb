@@ -26,7 +26,7 @@ module Data::Work
       elsif((modules['archive']['acceptable'] & work['archive']).length > 0) then
         categories << "ACCEPTABLE_ARCHIVE"
       else
-        categories << "UNACCCEPTABLE_ARCHIVE"
+        categories << "UNACCEPTABLE_ARCHIVE"
       end
 
       #License-
@@ -51,8 +51,7 @@ module Data::Work
         :date => {'date-parts'=> [right_now.year, right_now.month, right_now.day], :timestamp=> timestamp},
         :categories => categories
       }
-
-
+      
       works_coll(agency).update(
         {:DOI => work['DOI']}, 
         {:$set=> work,
