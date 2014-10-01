@@ -75,7 +75,7 @@ end
 
 get '/:agency/publisher/:name' do
   headers 'Access-Control-Allow-Origin' => '*',
-          'Access-Control-Allow-Methods' => ['POST'],
+          'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST'],
           'Access-Control-Allow-Headers' => 'Content-Type'
 
   jsonp fetch_publisher_works(params, settings.send("#{params[:agency]}_modules"));
@@ -84,8 +84,8 @@ end
 get '/:agency/tallies/:year/:month/:day' do
 
   headers 'Access-Control-Allow-Origin' => '*',
-          'Access-Control-Allow-Methods' => ['POST'],
+          'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST'],
           'Access-Control-Allow-Headers' => 'Content-Type'
-          
+
   jsonp fetch_tally_works(params, settings.send("#{params[:agency]}_modules"));
 end
