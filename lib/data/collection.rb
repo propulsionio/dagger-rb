@@ -46,6 +46,17 @@ module Data::Collection
       }
     end
 
+    puts series.inspect
+    puts series
+
+    series[0][:values].unshift( { :x=> 1407715200000 , :y=> 0 }  )
+    series[1][:values].unshift( { :x=> 1407715200000 , :y=> 0 }  )
+    series[2][:values].unshift( { :x=> 1407715200000 , :y=> 0 }  )
+    series[3][:values].unshift( { :x=> 1407715200000 , :y=> 0 }  )
+    series[4][:values].unshift( { :x=> 1407715200000 , :y=> 0 }  )
+
+
+
     {
       :latest => tallies.last,
       :series => series
