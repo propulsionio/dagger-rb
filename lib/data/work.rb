@@ -48,14 +48,14 @@ module Data::Work
       end
 
       stat = {
-        :date => {'date-parts'=> [right_now.year, right_now.month, right_now.day], :timestamp=> timestamp},
+        :date => {'date-parts'=> [right_now.year, right_now.month, right_now.day]},
         :categories => categories
       }
       
       works_coll(agency).update(
         {:DOI => work['DOI']}, 
         {:$set=> work,
-          :$push => {:stats => stat},
+          :$addToSet => {:stats => stat},
           :$setOnInsert=> {:created_at => {'date-parts'=> [right_now.year, right_now.month, right_now.day], :timestamp=> timestamp}}}, 
         {:upsert => true})
     end
