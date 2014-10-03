@@ -1,8 +1,0 @@
-66.108.128.58 - - [03/Oct/2014 13:38:12] "GET /nsf/branding?callback=angular.callbacks._0 HTTP/1.0" 200 266 0.0249
-66.108.128.58 - - [03/Oct/2014 13:38:12] "GET /nsf/tallies?callback=angular.callbacks._1 HTTP/1.0" 200 8351 0.0062
-66.108.128.58 - - [03/Oct/2014 13:38:12] "GET /nsf/breakdowns?callback=angular.callbacks._2 HTTP/1.0" 200 425 0.0015
-66.108.128.58 - - [03/Oct/2014 13:38:12] "GET /nsf/publishers?callback=angular.callbacks._3 HTTP/1.0" 200 1017 0.0024
-66.108.128.58 - - [03/Oct/2014 13:39:13] "GET /nsf/branding?callback=angular.callbacks._0 HTTP/1.0" 200 266 0.0010
-66.108.128.58 - - [03/Oct/2014 13:39:13] "GET /nsf/tallies?callback=angular.callbacks._1 HTTP/1.0" 200 8351 0.0064
-66.108.128.58 - - [03/Oct/2014 13:39:13] "GET /nsf/breakdowns?callback=angular.callbacks._2 HTTP/1.0" 200 425 0.0017
-66.108.128.58 - - [03/Oct/2014 13:39:13] "GET /nsf/publishers?callback=angular.callbacks._3 HTTP/1.0" 200 1017 0.0019
