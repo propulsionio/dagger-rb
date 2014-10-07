@@ -182,7 +182,7 @@ module Aggregate
     ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}.merge(today)
     acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}.merge(today)
 
-    work_count = works_coll(agency).count(today);
+    work_count = works_coll(agency).count({:query => today})
     fulltext_ok_count = works_coll(agency).count({:query => has_fulltext_query})
     license_ok_count = works_coll(agency).count({:query => ok_license_query})
     archive_ok_count = works_coll(agency).count({:query => ok_archive_query})
