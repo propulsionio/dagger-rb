@@ -157,22 +157,30 @@ module Aggregate
     end
 
     right_now = DateTime.now
+    
+    today = {
+      :year => right_now.year,
+      :month => right_now.month,
+      :day => right_now.day
+    }
 
     # When collection type of :publisher is chosen, this should do the
     # reverse - group by funder
     aggregate_publishers(agency, modules, right_now)
 
-    missing_license_query = {:license => {'$exists' => false}}
-    missing_archive_query = {:archive => {'$exists' => false}}
-    missing_fulltext_query = {:link => {'$exists' => false}}
 
-    has_fulltext_query = {:link => {'$exists' => true}}
+
+    missing_license_query = {:license => {'$exists' => false}}.merge(today)
+    missing_archive_query = {:archive => {'$exists' => false}}.merge(today)
+    missing_fulltext_query = {:link => {'$exists' => false}}.merge(today)
+
+    has_fulltext_query = {:link => {'$exists' => true}}.merge(today)
 
     # TODO Improve to include version (am, vor), max days from publication
     # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
-    ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
-    ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
-    acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
+    ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}.merge(today)
+    ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}.merge(today)
+    acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}.merge(today)
 
     work_count = works_coll(agency).count
     fulltext_ok_count = works_coll(agency).count({:query => has_fulltext_query})

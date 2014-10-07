@@ -47,6 +47,8 @@ module Data::Work
         categories << "UNACCEPTABLE_FULLTEXT"
       end
 
+      work['current_date'] = {'date-parts'=> [right_now.year, right_now.month, right_now.day]};
+
       stat = {
         :date => {'date-parts'=> [right_now.year, right_now.month, right_now.day]},
         :categories => categories
