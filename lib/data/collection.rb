@@ -1,5 +1,16 @@
 require 'mongo'
 
+
+
+
+#   VERY BAD IDEA!!!!
+
+def hash_merge *hashes
+  hashes.inject :merge
+end
+
+
+
 module Data::Collection
 
   def insert_success agency
@@ -82,6 +93,9 @@ module Data::Collection
   end
 
   def fetch_publishers agency
+
+    final_publishers = Array.new()
+
     publishers = publishers_coll(agency).find({}).map do |doc|
       {
         :name => doc['name'],
@@ -98,19 +112,53 @@ module Data::Collection
       end
     };
     
-    wiley_blackwell_publishers = publishers.select { |publisher| publisher[:name] == 'Wiley-Blackwell' }
-    wiley_blackwell_total_work_count =  wiley_blackwell_publishers.inject(0) do |work_count, hash|
-                                          work_count += hash[:measures][0]
-                                          work_count
-                                        end
-    wiley_blackwell_publisher = wiley_blackwell_publishers.first
-    wiley_blackwell_publisher.delete(:prefix)
-    wiley_blackwell_publisher.merge!({:measures => [wiley_blackwell_total_work_count],
-                                      :markers => [wiley_blackwell_total_work_count],
-                                      :ranges => [0, 250, 500, 1000, wiley_blackwell_total_work_count]})
-    publishers = publishers.reject { |publisher| publisher[:name] == 'Wiley-Blackwell' }
-    publishers + [wiley_blackwell_publisher]
+    # get list of unique names without duplicates
+    publisher_names = publishers.uniq{|publisher| publisher[:name] };
+    
+    # step through each name and combine all of the publisher counts
+    publisher_names.each { |publisher_list|
+
+	    # list of all publishers with the same name on the exact line below
+            same_publishers = publishers.select { |publisher| publisher[:name] == publisher_list[:name] }
+
+	    # the field values below will but summed, use these variable names below
+	    measures = 0
+	    markers = 0
+	    toprange = 0
+
+	    # for each publisher, sum the measures, markers, and last range
+	    # field value
+	    same_publishers.each{ |simple|
+		measures = measures + simple[:measures].first
+		markers = markers + simple[:markers].first
+		toprange = toprange + simple[:ranges].last
+	    };	    
+
+	    # use the first publish in the list of same publishers as a base line
+	    # and update the merged field values
+	    merged_publisher = same_publishers[0]
+
+		    merged_publisher[:measures] = [measures]
+		    merged_publisher[:markers] = [markers]
+		    merged_publisher[:ranges][5] = toprange
+
+	    # get all of the values here
+
+	    merged_publisher.delete(:prefix)
+
+	    publishers + [merged_publisher]
+
+	    # append the one unique publisher to the final publisher list
+            final_publishers << merged_publisher
+
+    };
+
+    # set the publishers returned to final publishers
+    publishers = final_publishers
+
+    # sort the publisher results
     publishers.sort_by { |publisher| publisher[:name] }
+
   end
 
   def fetch_collections agency
