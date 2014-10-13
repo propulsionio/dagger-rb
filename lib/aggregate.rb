@@ -18,26 +18,36 @@ module Aggregate
     if collection['custom-filters']
       query_str = "?filter=#{collection['custom-filters']}"
     end
+   
+    if (collection['type'] == 'publisher')
+		puts collection
+		puts collection['id']
+	      "/v1/publishers/#{collection['id']}/works#{query_str}"
+    end
 
     case collection['type']
-    when 'funder'
-      "/v1/funders/#{collection['id']}/works#{query_str}"
-    when 'publisher'
-      "/v1/publishers/#{collection['id']}/works#{query_str}"
+	    when 'publisher'
+		puts collection
+		puts collection['id']
+	      "/v1/publishers/#{collection['id']}/works#{query_str}"
+	    when 'funder'
+	      puts "/v1/funders/#{collection['id']}/works#{query_str}"
+	      "/v1/funders/#{collection['id']}/works#{query_str}"
     end
   end
 
   def aggregate_publishers agency, modules, right_now
     group = {'$group' => {
         '_id' => {
-          'prefix' => '$prefix',
+	  'member' => '$member',
           'name' => '$publisher'
         },
         'work_count' => {'$sum' => 1}}}
 
     works_coll(agency).aggregate([group]).each do |doc|
+      puts doc
       insert_doc = {
-        :prefix => doc['_id']['prefix'],
+        :member => doc['_id']['member'],
         :name => doc['_id']['name'],
         :work_count => doc['work_count']
       }
@@ -48,7 +58,9 @@ module Aggregate
         :day => right_now.day
       }
 
-      prefix_query = {:prefix => insert_doc[:prefix]}
+      prefix_query = {:member => insert_doc[:member]}
+
+	puts insert_doc
 
       missing_license_query = {:license => {'$exists' => false}}.merge(prefix_query)
       missing_archive_query = {:archive => {'$exists' => false}}.merge(prefix_query)
@@ -94,27 +106,27 @@ module Aggregate
                  :work_count_acceptable => acceptable_count,
                  :work_count_unacceptable => unacceptable_count})
 
-      breakdowns_coll(agency).update({:prefix => insert_doc[:prefix]}.merge(today), insert_doc, {:upsert => true})
-      publishers_coll(agency).update({:prefix => insert_doc[:prefix]}, insert_doc, {:upsert => true})
+      breakdowns_coll(agency).update({:member => insert_doc[:member]}.merge(today), insert_doc, {:upsert => true})
+      publishers_coll(agency).update({:member => insert_doc[:member]}, insert_doc, {:upsert => true})
     end
   end
 
   def agencyly_work_rules collection, works
-    if collection['prefixes']['include']
-      include_list = collection['prefixes']['include'].map do |prefix|
-        "http://id.crossref.org/prefix/#{prefix}"
+    if collection['members']['include']
+      include_list = collection['members']['include'].map do |member|
+        "http://id.crossref.org/member/#{member}"
       end
 
       works.reject do |work|
-        !include_list.include?(work['prefix'])
+        !include_list.include?(work['member'])
       end
-    elsif collection['prefixes']['exclude']
-      exclude_list = collection['prefixes']['exclude'].map do |prefix|
-        "http://id.crossref.org/prefix/#{prefix}"
+    elsif collection['members']['exclude']
+      exclude_list = collection['members']['exclude'].map do |member|
+        "http://id.crossref.org/member/#{member}"
       end
 
       works.reject do |work|
-        exclude_list.include?(work['prefix'])
+        exclude_list.include?(work['member'])
       end
     else
       works
@@ -130,10 +142,12 @@ module Aggregate
       works = []
       response = conn.get do |req|
         req.url(make_collection_path(collection) << "&offset=#{offset}&rows=#{rows}")
+	
       end
 
       if response.success?
         works = JSON.parse(response.body)['message']['items']
+	#puts works
         if works.empty?
           insert_success agency
           success = true

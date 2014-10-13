@@ -97,9 +97,10 @@ module Data::Collection
     final_publishers = Array.new()
 
     publishers = publishers_coll(agency).find({}).map do |doc|
+	puts doc['member'].split('/').last()
       {
         :name => doc['name'],
-        :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
+        :member => doc['member'].split('/').last(),
         :measures => [doc['work_count']],
         :markers => [doc['work_count']],
         :ranges => [0, 250, 500, 1000, doc['work_count']]
