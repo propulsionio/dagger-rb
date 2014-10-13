@@ -45,7 +45,6 @@ module Aggregate
         'work_count' => {'$sum' => 1}}}
 
     works_coll(agency).aggregate([group]).each do |doc|
-      puts doc
       insert_doc = {
         :member => doc['_id']['member'],
         :name => doc['_id']['name'],
@@ -59,8 +58,6 @@ module Aggregate
       }
 
       prefix_query = {:member => insert_doc[:member]}
-
-	puts insert_doc
 
       missing_license_query = {:license => {'$exists' => false}}.merge(prefix_query)
       missing_archive_query = {:archive => {'$exists' => false}}.merge(prefix_query)
@@ -147,7 +144,6 @@ module Aggregate
 
       if response.success?
         works = JSON.parse(response.body)['message']['items']
-	#puts works
         if works.empty?
           insert_success agency
           success = true

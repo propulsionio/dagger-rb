@@ -97,7 +97,6 @@ module Data::Collection
     final_publishers = Array.new()
 
     publishers = publishers_coll(agency).find({}).map do |doc|
-	puts doc['member'].split('/').last()
       {
         :name => doc['name'],
         :member => doc['member'].split('/').last(),
