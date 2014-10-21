@@ -20,18 +20,18 @@ module Aggregate
     end
    
     if (collection['type'] == 'publisher')
-		puts collection
-		puts collection['id']
+		#puts collection
+		#puts collection['id']
 	      "/v1/publishers/#{collection['id']}/works#{query_str}"
     end
 
     case collection['type']
 	    when 'publisher'
-		puts collection
-		puts collection['id']
+		#puts collection
+		#puts collection['id']
 	      "/v1/publishers/#{collection['id']}/works#{query_str}"
 	    when 'funder'
-	      puts "/v1/funders/#{collection['id']}/works#{query_str}"
+	      #puts "/v1/funders/#{collection['id']}/works#{query_str}"
 	      "/v1/funders/#{collection['id']}/works#{query_str}"
     end
   end

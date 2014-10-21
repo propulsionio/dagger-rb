@@ -186,20 +186,58 @@ module Data::Collection
   end
 
   def fetch_publisher_table agency
-    publishers_coll(agency).find({}).map do |doc|
-      [doc['name'],
-       doc['work_count'],
-       doc['work_count_ok_archive'],
-       doc['work_count_missing_archive'],
-       doc['work_count_bad_archive'],
-       doc['work_count_ok_fulltext'],
-       doc['work_count_missing_fulltext'],
-       doc['work_count_bad_fulltext'],
-       doc['work_count_ok_license'],
-       doc['work_count_missing_license'],
-       doc['work_count_bad_license'],
-       doc['work_count_acceptable']]
-    end
+
+	# temporary solution until we merge the 
+	# publishers on the backend
+
+	publishers_coll(agency).aggregate([
+	  {"$project" => {
+		_id: 0, 
+		name: 1,
+		work_count: 1, 
+		work_count_ok_archive: 1,
+		work_count_missing_archive: 1,
+		work_count_bad_archive: 1,
+		work_count_ok_fulltext: 1,
+		work_count_missing_fulltext: 1,
+		work_count_bad_fulltext: 1,
+		work_count_ok_license: 1,
+		work_count_missing_license: 1,
+		work_count_bad_license: 1,
+		work_count_acceptable: 1,
+		}
+	  },
+	  {"$group" => {
+		_id: "$name", 
+		work_count: {"$max"=>"$work_count"}, 
+		work_count_ok_archive: {"$max"=>"$work_count_ok_archive"},
+		work_count_missing_archive: {"$max"=>"$work_count_missing_archive"},
+		work_count_bad_archive: {"$max"=>"$work_count_bad_archive"},
+		work_count_ok_fulltext: {"$max"=>"$work_count_ok_fulltext"},
+		work_count_missing_fulltext: {"$max"=>"$work_count_missing_fulltext"},
+		work_count_bad_fulltext: {"$max"=>"$work_count_bad_fulltext"},
+		work_count_ok_license: {"$max"=>"$work_count_ok_license"},
+		work_count_missing_license: {"$max"=>"$work_count_missing_license"},
+		work_count_bad_license: {"$max"=>"$work_count_bad_license"},
+		work_count_acceptable: {"$max"=>"$work_count_acceptable"},
+	  	}
+	  }
+	]).map do |doc|
+	      [doc['_id'],
+	       doc['work_count'],
+	       doc['work_count_ok_archive'],
+	       doc['work_count_missing_archive'],
+	       doc['work_count_bad_archive'],
+	       doc['work_count_ok_fulltext'],
+	       doc['work_count_missing_fulltext'],
+	       doc['work_count_bad_fulltext'],
+	       doc['work_count_ok_license'],
+	       doc['work_count_missing_license'],
+	       doc['work_count_bad_license'],
+	       doc['work_count_acceptable']]
+	    end
+
+	#puts final_publishers
   end
 
   def fetch_publisher_works params, modules
