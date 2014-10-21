@@ -1,5 +1,16 @@
 require 'mongo'
 
+
+
+
+#   VERY BAD IDEA!!!!
+
+def hash_merge *hashes
+  hashes.inject :merge
+end
+
+
+
 module Data::Collection
 
   def insert_success agency
@@ -82,10 +93,13 @@ module Data::Collection
   end
 
   def fetch_publishers agency
+
+    final_publishers = Array.new()
+
     publishers = publishers_coll(agency).find({}).map do |doc|
       {
         :name => doc['name'],
-        :prefix => doc['prefix'].split('/').last().gsub(/\./, ''),
+        #:member => doc['member'].split('/').last(),
         :measures => [doc['work_count']],
         :markers => [doc['work_count']],
         :ranges => [0, 250, 500, 1000, doc['work_count']]
@@ -98,19 +112,53 @@ module Data::Collection
       end
     };
     
-    wiley_blackwell_publishers = publishers.select { |publisher| publisher[:name] == 'Wiley-Blackwell' }
-    wiley_blackwell_total_work_count =  wiley_blackwell_publishers.inject(0) do |work_count, hash|
-                                          work_count += hash[:measures][0]
-                                          work_count
-                                        end
-    wiley_blackwell_publisher = wiley_blackwell_publishers.first
-    wiley_blackwell_publisher.delete(:prefix)
-    wiley_blackwell_publisher.merge!({:measures => [wiley_blackwell_total_work_count],
-                                      :markers => [wiley_blackwell_total_work_count],
-                                      :ranges => [0, 250, 500, 1000, wiley_blackwell_total_work_count]})
-    publishers = publishers.reject { |publisher| publisher[:name] == 'Wiley-Blackwell' }
-    publishers + [wiley_blackwell_publisher]
+    # get list of unique names without duplicates
+    publisher_names = publishers.uniq{|publisher| publisher[:name] };
+    
+    # step through each name and combine all of the publisher counts
+    publisher_names.each { |publisher_list|
+
+	    # list of all publishers with the same name on the exact line below
+            same_publishers = publishers.select { |publisher| publisher[:name] == publisher_list[:name] }
+
+	    # the field values below will but summed, use these variable names below
+	    measures = 0
+	    markers = 0
+	    toprange = 0
+
+	    # for each publisher, sum the measures, markers, and last range
+	    # field value
+	    same_publishers.each{ |simple|
+		measures = measures + simple[:measures].first
+		markers = markers + simple[:markers].first
+		toprange = toprange + simple[:ranges].last
+	    };	    
+
+	    # use the first publish in the list of same publishers as a base line
+	    # and update the merged field values
+	    merged_publisher = same_publishers[0]
+
+		    merged_publisher[:measures] = [measures]
+		    merged_publisher[:markers] = [markers]
+		    merged_publisher[:ranges][5] = toprange
+
+	    # get all of the values here
+
+	    merged_publisher.delete(:prefix)
+
+	    publishers + [merged_publisher]
+
+	    # append the one unique publisher to the final publisher list
+            final_publishers << merged_publisher
+
+    };
+
+    # set the publishers returned to final publishers
+    publishers = final_publishers
+
+    # sort the publisher results
     publishers.sort_by { |publisher| publisher[:name] }
+
   end
 
   def fetch_collections agency
@@ -138,20 +186,58 @@ module Data::Collection
   end
 
   def fetch_publisher_table agency
-    publishers_coll(agency).find({}).map do |doc|
-      [doc['name'],
-       doc['work_count'],
-       doc['work_count_ok_archive'],
-       doc['work_count_missing_archive'],
-       doc['work_count_bad_archive'],
-       doc['work_count_ok_fulltext'],
-       doc['work_count_missing_fulltext'],
-       doc['work_count_bad_fulltext'],
-       doc['work_count_ok_license'],
-       doc['work_count_missing_license'],
-       doc['work_count_bad_license'],
-       doc['work_count_acceptable']]
-    end
+
+	# temporary solution until we merge the 
+	# publishers on the backend
+
+	publishers_coll(agency).aggregate([
+	  {"$project" => {
+		_id: 0, 
+		name: 1,
+		work_count: 1, 
+		work_count_ok_archive: 1,
+		work_count_missing_archive: 1,
+		work_count_bad_archive: 1,
+		work_count_ok_fulltext: 1,
+		work_count_missing_fulltext: 1,
+		work_count_bad_fulltext: 1,
+		work_count_ok_license: 1,
+		work_count_missing_license: 1,
+		work_count_bad_license: 1,
+		work_count_acceptable: 1,
+		}
+	  },
+	  {"$group" => {
+		_id: "$name", 
+		work_count: {"$max"=>"$work_count"}, 
+		work_count_ok_archive: {"$max"=>"$work_count_ok_archive"},
+		work_count_missing_archive: {"$max"=>"$work_count_missing_archive"},
+		work_count_bad_archive: {"$max"=>"$work_count_bad_archive"},
+		work_count_ok_fulltext: {"$max"=>"$work_count_ok_fulltext"},
+		work_count_missing_fulltext: {"$max"=>"$work_count_missing_fulltext"},
+		work_count_bad_fulltext: {"$max"=>"$work_count_bad_fulltext"},
+		work_count_ok_license: {"$max"=>"$work_count_ok_license"},
+		work_count_missing_license: {"$max"=>"$work_count_missing_license"},
+		work_count_bad_license: {"$max"=>"$work_count_bad_license"},
+		work_count_acceptable: {"$max"=>"$work_count_acceptable"},
+	  	}
+	  }
+	]).map do |doc|
+	      [doc['_id'],
+	       doc['work_count'],
+	       doc['work_count_ok_archive'],
+	       doc['work_count_missing_archive'],
+	       doc['work_count_bad_archive'],
+	       doc['work_count_ok_fulltext'],
+	       doc['work_count_missing_fulltext'],
+	       doc['work_count_bad_fulltext'],
+	       doc['work_count_ok_license'],
+	       doc['work_count_missing_license'],
+	       doc['work_count_bad_license'],
+	       doc['work_count_acceptable']]
+	    end
+
+	#puts final_publishers
   end
 
   def fetch_publisher_works params, modules

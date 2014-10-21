@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'yaml'
-require 'json'
+require 'json' 
 
 require_relative 'lib/configuration'
 require_relative 'lib/aggregate'
