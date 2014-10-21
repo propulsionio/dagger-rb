@@ -27,7 +27,7 @@ module Aggregate
     end
   end
 
-  def aggregate_publishers agency, modules, right_now
+  def aggregate_publishers agency, right_now, modules
     group = {'$group' => {
         '_id' => {
           'prefix' => '$prefix',
@@ -35,6 +35,8 @@ module Aggregate
         },
         'work_count' => {'$sum' => 1}}}
 
+    
+    
     works_coll(agency).aggregate([group]).each do |doc|
       insert_doc = {
         :prefix => doc['_id']['prefix'],
@@ -58,9 +60,9 @@ module Aggregate
 
       # TODO Improve to include version (am, vor), max days from publication
       # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
-      ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
+      ok_license_query = {'license.URL' => {'$in' => modules["acceptableLicenses"]}}
         .merge(prefix_query)
-      ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}
+      ok_archive_query = {:archive => {'$in' => modules["acceptableArchives"]}}
         .merge(prefix_query)
       acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}
 
@@ -151,10 +153,6 @@ module Aggregate
   end
 
   def aggregate_works agency, modules
-    modules = modules.reduce({}) do |memo, obj|
-      memo[obj['name']] = obj
-      memo
-    end
 
     right_now = DateTime.now
     
@@ -166,9 +164,7 @@ module Aggregate
 
     # When collection type of :publisher is chosen, this should do the
     # reverse - group by funder
-    aggregate_publishers(agency, modules, right_now)
-
-
+    aggregate_publishers(agency, right_now, modules)
 
     missing_license_query = {:license => {'$exists' => false}}.merge(today)
     missing_archive_query = {:archive => {'$exists' => false}}.merge(today)
@@ -178,8 +174,8 @@ module Aggregate
 
     # TODO Improve to include version (am, vor), max days from publication
     # TODO Check fulltexts for resolvability, check fulltext version, fulltext mime
-    ok_license_query = {'license.URL' => {'$in' => modules['license']['acceptable']}}.merge(today)
-    ok_archive_query = {:archive => {'$in' => modules['archive']['acceptable']}}.merge(today)
+    ok_license_query = {'license.URL' => {'$in' => modules['acceptableLicenses']}}.merge(today)
+    ok_archive_query = {:archive => {'$in' => modules['acceptableArchives']}}.merge(today)
     acceptable_query = {'$and' => [has_fulltext_query, ok_license_query, ok_archive_query]}.merge(today)
 
     work_count = works_coll(agency).count({:query => today})
@@ -224,16 +220,26 @@ module Aggregate
     else
       puts "Attempting work sync (retry #{retries})"
 
-      success = collect_works(agency, config['collection'], 0, config['module'])
+      agency_module = get_module(agency);
+      success = collect_works(agency, config['collection'], 0, agency_module)
 
       if success
-        aggregate_works(agency, config['module'])
+        aggregate_works(agency, agency_module)
       elsif retries < config['collection']['retry-attempts']
         scheduler.in(config['collection']['retry-interval']) do
           do_works(agency, config, scheduler, retries + 1)
         end
       end
     end
+  end
+
+
+  def get_module agency
+
+    agencies_collection = settings.send("dashboard_db")["agencies"];
+    
+    agency_data = agencies_collection.find("shortName" => /#{agency}/i).to_a
+    agency_data = agency_data[0]['currentSettings']
   end
 
   def prepare_schedule agency, config

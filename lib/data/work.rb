@@ -11,11 +11,6 @@ module Data::Work
     right_now = DateTime.now
     timestamp = right_now.strftime('%Q').to_i
 
-    modules = modules.reduce({}) do |memo, obj|
-      memo[obj['name']] = obj
-      memo
-    end
-
     works.each do |work|
 
       categories = [];
@@ -23,7 +18,7 @@ module Data::Work
       #Archive-
       if(!work.key?('archive')) then
         categories << "UNKNOWN_ARCHIVE";
-      elsif((modules['archive']['acceptable'] & work['archive']).length > 0) then
+      elsif((modules['acceptableArchives'] & work['archive']).length > 0) then
         categories << "ACCEPTABLE_ARCHIVE"
       else
         categories << "UNACCEPTABLE_ARCHIVE"
@@ -32,7 +27,7 @@ module Data::Work
       #License-
       if(!work.key?('license')) then
         categories << "UNKNOWN_LICENSE"
-      elsif(modules['license']['acceptable'].include?work['license'][0]['URL']) then
+      elsif(modules['acceptableLicenses'].include?work['license'][0]['URL']) then
         categories << "ACCEPTABLE_LICENSE"
       else
         categories << "UNACCEPTABLE_LICENSE"

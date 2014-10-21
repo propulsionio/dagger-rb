@@ -28,13 +28,23 @@ configure do
   include DataConf
   include Aggregate
 
-  load_configuration('conf.yaml').each do |agency, config|
+  configuration = load_configuration('conf.yaml');
+
+  #Connecting to dashboard super user database
+  set "dashboard_db_conn", Mongo::Connection.new(configuration['dashboard_admin']['mongo']['host'])
+  set "dashboard_db", settings.send("dashboard_db_conn")[configuration['dashboard_admin']['mongo']['db']]
+  
+  configuration = configuration.tap { |hash| hash.delete("dashboard_admin") }
+
+  configuration.each do |agency, config|
+
     prepare_database(agency, config)
     prepare_schedule(agency, config)
 
     set "#{agency}_branding", config['branding']
     set "#{agency}_modules", config['module'];
   end
+
 end
 
 post '/:agency/works' do
@@ -77,7 +87,7 @@ get '/:agency/publisher/:name' do
   headers 'Access-Control-Allow-Origin' => '*',
           'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
 
-  jsonp fetch_publisher_works(params, settings.send("#{params[:agency]}_modules"));
+  jsonp fetch_publisher_works(params, get_module(params[:agency]));
 end
 
 get '/:agency/tallies/:year/:month/:day' do
@@ -85,5 +95,5 @@ get '/:agency/tallies/:year/:month/:day' do
   headers 'Access-Control-Allow-Origin' => '*',
           'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
 
-  jsonp fetch_tally_works(params, settings.send("#{params[:agency]}_modules"));
+  jsonp fetch_tally_works(params);
 end

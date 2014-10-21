@@ -155,20 +155,17 @@ module Data::Collection
   end
 
   def fetch_publisher_works params, modules
+
+    puts modules;
     data = [];
     query = {};
-
-    modules = modules.reduce({}) do |memo, obj|
-      memo[obj['name']] = obj
-      memo
-    end
 
     if (params[:category] && !params[:category].eql?("all")) then
 
       if(params[:category].eql?("archive")) then
         case params[:subcategory]
         when 'acceptable'
-          query = {:archive => {'$in' => modules['archive']['acceptable']}}
+          query = {:archive => {'$in' => modules['acceptableArchives']}}
         when 'unknown'
           query = {:archive => {'$exists' => false}}
         when 'unacceptable'
@@ -188,21 +185,21 @@ module Data::Collection
       elsif(params[:category].eql?("license")) then
         case params[:subcategory]
         when 'acceptable'
-          query = {'license.URL' => {'$in' => modules['license']['acceptable']}}
+          query = {'license.URL' => {'$in' => modules['acceptableLicenses']}}
         when 'unknown'
           query = {:license => {'$exists' => false}}
         when 'unacceptable'
-          query = {'$and'=> [:license => {'$exists' => true}, 'license.URL' => {'$nin' => modules['license']['acceptable']}]}
+          query = {'$and'=> [:license => {'$exists' => true}, 'license.URL' => {'$nin' => modules['acceptableLicenses']}]}
         end
 
       elsif (params[:category].eql?("total_acceptable"))
-        query = {'$and' => [{:link => {'$exists' => true}}, {'license.URL' => {'$in' => modules['license']['acceptable']}}, {:archive => {'$in' => modules['archive']['acceptable']}}]}
+        query = {'$and' => [{:link => {'$exists' => true}}, {'license.URL' => {'$in' => modules['acceptableLicenses']}}, {:archive => {'$in' => modules['acceptableArchives']}}]}
       end
 
       works_coll(params[:agency]).find(query.merge({:publisher=> params[:name]})).each do |doc|
 
         if(params[:category].eql?("archive") && params[:subcategory].eql?("unacceptable")) then
-          if((modules['archive']['acceptable'] & doc['archive']).length == 0) then
+          if((modules['acceptableArchives'] & doc['archive']).length == 0) then
             data << {:funder=> doc['funder'], :publisher => doc['publisher'], :doi => doc['DOI'], :url => doc['URL']}
           end
         else
@@ -219,7 +216,7 @@ module Data::Collection
     data
   end
 
-  def fetch_tally_works params, modules
+  def fetch_tally_works params
     data = [];
     query = {};
     category = "";
