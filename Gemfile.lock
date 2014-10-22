@@ -108,5 +108,5 @@ DEPENDENCIES
   rails
   rufus-scheduler
   sinatra
-  site24x7_apminsight
+  site24x7_apminsight (>= 1.1)
   thin

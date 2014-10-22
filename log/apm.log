@@ -22,3 +22,24 @@
 [2014-10-22 16:26:17 +0000|25687]:[doCollect] Starts - Wait time : 60 seconds 
 [2014-10-22 16:26:17 +0000|25687]:start worker thread for - 25687 :: initialized  
 [2014-10-22 16:26:18 +0000|25687]:worker save signals
+[2014-10-22 17:12:36 +0000|28431]:License key is not null. Connecting to site24x7
+[2014-10-22 17:12:36 +0000|28431]: => 
+[2014-10-22 17:12:36 +0000|28431]:license.key => ba637684cf51ee745d6fdd37c94ca45a
+[2014-10-22 17:12:36 +0000|28431]:application.name => Dagger-RB
+[2014-10-22 17:12:36 +0000|28431]:behind.proxy => false
+[2014-10-22 17:12:36 +0000|28431]:agent.server.port => 9293
+[2014-10-22 17:12:36 +0000|28431]:apdex.threshold => 0.5
+[2014-10-22 17:12:36 +0000|28431]:sql.capture.enabled => true
+[2014-10-22 17:12:36 +0000|28431]:transaction.trace.enabled => true
+[2014-10-22 17:12:36 +0000|28431]:transaction.trace.threshold => 2
+[2014-10-22 17:12:36 +0000|28431]:transaction.trace.sql.parametrize => true
+[2014-10-22 17:12:36 +0000|28431]:transaction.trace.sql.stacktrace.threshold => 3
+[2014-10-22 17:12:36 +0000|28431]:webtransaction.trace.input.params.record => false
+[2014-10-22 17:12:36 +0000|28431]:webtransaction.trace.input.params.ignore => password, pswd, pass, authKey, parentId, parentID, resourceId, resourceID, id, ID
+[2014-10-22 17:12:36 +0000|28431]:transaction.skip.listening => *.css, *.js, *.gif, *.jpg, *.jpeg, *.bmp, *.png
+[2014-10-22 17:12:36 +0000|28431]:transaction.tracking.request.interval => 1
+[2014-10-22 17:12:36 +0000|28431]:apminsight.log.level => INFO
+[2014-10-22 17:12:36 +0000|28431]:URL Merge Patterns
+[2014-10-22 17:12:38 +0000|28431]:Agent Initialization - DONE
+[2014-10-22 17:12:38 +0000|28431]:[doCollect] Starts - Wait time : 60 seconds 
+[2014-10-22 17:12:38 +0000|28431]:start worker thread for - 28431 :: initialized  
