@@ -7,6 +7,7 @@ require_relative 'lib/aggregate'
 require_relative 'lib/data'
 require_relative 'lib/data/work'
 require_relative 'lib/data/collection'
+require 'site24x7_apminsight'
 
 helpers do
   include Data::Work
