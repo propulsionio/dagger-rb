@@ -13,6 +13,7 @@ GEM
     mongo (1.9.2)
       bson (~> 1.9.2)
     multipart-post (1.2.0)
+    newrelic_rpm (3.9.6.257)
     rack (1.5.2)
     rack-protection (1.5.0)
       rack
@@ -40,6 +41,7 @@ DEPENDENCIES
   faraday
   json
   mongo
+  newrelic_rpm
   rufus-scheduler
   sinatra
   thin
