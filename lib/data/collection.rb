@@ -249,7 +249,9 @@ module Data::Collection
   aip_publishers = publishers.select { |publisher| publisher[0] == 'AIP Publishing' }
 
   #Delete AIP publishers from publishers array
-  publishers = publishers.reject { |publisher| publisher[0] == 'AIP Publishing' }
+  publishers = publishers.reject { |publisher| 
+    publisher[0] == ('AIP Publishing' || 'American Institute of Physics (AIP)')
+  }
   
   #create a new AIP publisher array by assigning it first AIP publisher from AIP publishers array
   aip_publisher = aip_publishers.first
