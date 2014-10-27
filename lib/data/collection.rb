@@ -261,17 +261,17 @@ module Data::Collection
 
   #Evaluate aggregated counts for AIP publisher
   aip_publishers.each { |publisher|
-    aip_publishers[1] += publisher[1]
-    aip_publishers[2] += publisher[2]
-    aip_publishers[3] += publisher[3]
-    aip_publishers[4] += publisher[4]
-    aip_publishers[5] += publisher[5]
-    aip_publishers[6] += publisher[6]
-    aip_publishers[7] += publisher[7]
-    aip_publishers[8] += publisher[8]
-    aip_publishers[9] += publisher[9]
-    aip_publishers[10] += publisher[10]
-    aip_publishers[11] += publisher[11]
+    aip_publisher[1] += publisher[1]
+    aip_publisher[2] += publisher[2]
+    aip_publisher[3] += publisher[3]
+    aip_publisher[4] += publisher[4]
+    aip_publisher[5] += publisher[5]
+    aip_publisher[6] += publisher[6]
+    aip_publisher[7] += publisher[7]
+    aip_publisher[8] += publisher[8]
+    aip_publisher[9] += publisher[9]
+    aip_publisher[10] += publisher[10]
+    aip_publisher[11] += publisher[11]
   }
 
   #Add AIP publisher to publishers array
