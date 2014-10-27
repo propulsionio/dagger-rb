@@ -261,8 +261,8 @@ module Data::Collection
 
   #Evaluate aggregated counts for AIP publisher
   aip_publishers.each { |publisher|
-    aip_publishers[1] += publisher[0]
-    aip_publishers[2] += publisher[1]
+    aip_publishers[1] += publisher[1]
+    aip_publishers[2] += publisher[2]
     aip_publishers[3] += publisher[3]
     aip_publishers[4] += publisher[4]
     aip_publishers[5] += publisher[5]
