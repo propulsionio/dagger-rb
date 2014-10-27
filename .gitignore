@@ -2,3 +2,8 @@ conf.yaml
 vendor
 Gem.lock
 all.txt
+apminsight.conf
+apminsight.info
+apminsight.lock
+apminsight.store
+log/apm.log
