@@ -107,7 +107,7 @@ module Data::Collection
     end
 
     publishers = publishers.reject { |publisher| 
-      publisher[0] =='American Institute of Physics (AIP)'
+      publisher[:name] =='American Institute of Physics (AIP)'
     }
     
     # get list of unique names without duplicates
