@@ -237,52 +237,15 @@ module Data::Collection
 	       doc['work_count_acceptable']]
 	    end
 
-  #Temporary fix. Not sure if this is the right way to deal with AIP publisher
-  #Similar thing was done in fetch_publishers
-  publishers.each { |publisher|
-    if(publisher[0] == 'American Institute of Physics (AIP)') then 
-      publisher[0] = "AIP Publishing" 
-    end
-  };
-
-  #Find all AIP publishers
-  aip_publishers = publishers.select { |publisher| publisher[0] == 'AIP Publishing' }
-
-  #Delete AIP publishers from publishers array
   publishers = publishers.reject { |publisher| 
-    publisher[0] == ('AIP Publishing' || 'American Institute of Physics (AIP)')
+    publisher[0] =='American Institute of Physics (AIP)'
   }
-  
-  #create a new AIP publisher array by assigning it first AIP publisher from AIP publishers array
-  aip_publisher = aip_publishers.first
-
-  #Delete first AIP publisher from, since we have already saved it to aip_publisher
-  aip_publishers.shift
-
-  #Evaluate aggregated counts for AIP publisher
-  aip_publishers.each { |publisher|
-    aip_publisher[1] += publisher[1]
-    aip_publisher[2] += publisher[2]
-    aip_publisher[3] += publisher[3]
-    aip_publisher[4] += publisher[4]
-    aip_publisher[5] += publisher[5]
-    aip_publisher[6] += publisher[6]
-    aip_publisher[7] += publisher[7]
-    aip_publisher[8] += publisher[8]
-    aip_publisher[9] += publisher[9]
-    aip_publisher[10] += publisher[10]
-    aip_publisher[11] += publisher[11]
-  }
-
-  #Add AIP publisher to publishers array
-  publishers << aip_publisher;
-
+ 
 	#puts final_publishers
   end
 
   def fetch_publisher_works params, modules
 
-    puts modules;
     data = [];
     query = {};
 
