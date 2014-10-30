@@ -106,11 +106,9 @@ module Data::Collection
       }
     end
 
-    publishers.each { |publisher| 
-      if(publisher[:name] == 'American Institute of Physics (AIP)') then 
-        publisher[:name] = "AIP Publishing" 
-      end
-    };
+    publishers = publishers.reject { |publisher| 
+      publisher[0] =='American Institute of Physics (AIP)'
+    }
     
     # get list of unique names without duplicates
     publisher_names = publishers.uniq{|publisher| publisher[:name] };
