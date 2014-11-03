@@ -23,8 +23,16 @@ module Data::Collection
 
   def fetch_tallies agency
     date_sort = [['year', 1], ['month', 1], ['day', 1]]
+    special_month = 8
+    special_day   = 1
+    
+    if agency == "usaid" || agency == "smithsonian"
+      special_month = 10
+      special_day = 14
+    end
+
     tallies = tallies_coll(agency).find(
-      { :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => 8 } }, { day: { :$gte => 1 } } ] },
+      { :$and => [ { year: { :$gte => 2014 } }, { month: { :$gte => special_month } }, { day: { :$gte => special_day } } ] },
       { sort: date_sort }
     ).map do |tally_doc|
       {
